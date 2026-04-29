@@ -1,14 +1,18 @@
 const { test, expect } = require('playwright/test');
+const locale = require('./locale/organizations/pl_b_u.json');
+const { buildOrganizationSetupStory } = require('./recordings/organization-setup.story');
 const {
   buildDemoContent,
   buildUser,
-  createFacility,
-  createOffice,
-  createOrganization,
   loginUser,
   openOrganizations,
   registerUser,
 } = require('./helpers/eden-demo');
+const {
+  createFacility,
+  createOffice,
+  createOrganization,
+} = require('./helpers/organization-flow');
 
 async function ensureResourceType(page, typeName) {
   await page.goto('/eden/org/resource/create', { waitUntil: 'domcontentloaded' });
@@ -64,12 +68,13 @@ async function createResource(page, organizationName) {
 test('registers, logs in, navigates to Organizations, and creates core records', async ({ page }) => {
   const user = buildUser();
   const content = buildDemoContent('full');
+  const story = buildOrganizationSetupStory(locale, content);
 
   await registerUser(page, user);
   await loginUser(page, user);
   await openOrganizations(page);
-  await createOrganization(page, content.organizationName);
-  await createOffice(page, content.organizationName, content.officeName);
-  await createFacility(page, content.organizationName, content.facilityName);
+  await createOrganization(page, story.organization);
+  await createOffice(page, story.office);
+  await createFacility(page, story.facility);
   await createResource(page, content.organizationName);
 });
