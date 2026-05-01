@@ -1,0 +1,101 @@
+{
+  "warehouse_type_name": "Magazyn centralny",
+  "warehouse_type_comments": "Główny typ magazynu dla zapasów operacyjnych.",
+  "catalog_name": "Katalog zapasów medycznych",
+  "catalog_comments": "Katalog wykorzystywany do prezentacji pozycji magazynowych.",
+  "catalog_organization": "Timor-Leste Red Cross Society",
+  "item_category_catalog": {
+    "label": "Food"
+  },
+  "item_category_code": "MED-KIT",
+  "item_category_name": "Zestawy medyczne",
+  "item_category_comments": "Kategoria obejmuje gotowe zestawy do szybkiej dystrybucji.",
+  "item_catalog": {
+    "label": "Food"
+  },
+  "item_category": {
+    "label": "Biscuits"
+  },
+  "item_code": "KIT-001",
+  "item_name": "Zestaw pierwszej pomocy",
+  "item_unit": {
+    "label": "piece"
+  },
+  "item_model": "Standard 2026",
+  "item_year": "2026",
+  "item_comments": "Pozycja pokazowa do prezentacji pracy magazynu.",
+  "supplier_name": "Fundacja Pomoc Logistyczna",
+  "supplier_acronym": "FPL",
+  "supplier_country": {
+    "label": "Poland"
+  },
+  "supplier_phone": "+48 22 300 40 50",
+  "supplier_website": "https://fpl.example.org",
+  "supplier_year": "2018",
+  "supplier_comments": "Dostawca współpracujący przy dostawach kryzysowych.",
+  "warehouse_name": "Magazyn Warszawa Centrum",
+  "warehouse_code": "WWC-01",
+  "warehouse_organization": "Timor-Leste Red Cross Society",
+  "warehouse_type": {
+    "label": "Facility"
+  },
+  "warehouse_country": {
+    "label": "Poland"
+  },
+  "warehouse_address": "ul. Towarowa 25",
+  "warehouse_postcode": "00-869",
+  "warehouse_capacity": "240",
+  "warehouse_contact": "Anna Nowak",
+  "warehouse_phone1": "+48 22 410 20 30",
+  "warehouse_phone2": "+48 22 410 20 31",
+  "warehouse_email": "magazyn.centrum@example.org",
+  "warehouse_comments": "Magazyn obsługujący dystrybucję dla centralnej części miasta.",
+  "incoming_facility": "MS Warehouse (Warehouse)",
+  "incoming_shipment_type": {
+    "label": "Another Inventory"
+  },
+  "incoming_date": "2026-05-02 09:30",
+  "incoming_waybill_number": "WB-2026-051",
+  "incoming_po_number": "PO-2026-114",
+  "incoming_req_number": "REQ-IN-2026-014",
+  "incoming_received_by": "Piotr Malec",
+  "incoming_comments": "Dostawa przyjęta zgodnie z dokumentem przewozowym.",
+  "sent_from_facility": "Baucau Warehouse (Warehouse)",
+  "sent_shipment_type": {
+    "label": "Distribution"
+  },
+  "sent_req_number": "REQ-OUT-2026-021",
+  "sent_to_facility": "MS Office 4 (Office)",
+  "sent_to_organization": "Timor-Leste Red Cross Society",
+  "sent_sent_by": "Marta Wilk",
+  "sent_to_person": "Jan Zielinski",
+  "sent_driver_name": "Tomasz Kurek",
+  "sent_driver_phone": "+48 600 700 800",
+  "sent_vehicle_plate": "WX 4582K",
+  "sent_time_out": "10:45:00",
+  "sent_comments": "Wysylka przygotowana do przekazania odbiorcy.",
+  "request_type": {
+    "label": "Warehouse Stock"
+  },
+  "request_ref": "REQ-2026-305",
+  "request_date": "2026-05-03 08:15",
+  "request_priority": {
+    "label": "High"
+  },
+  "request_site": "MS Warehouse (Warehouse)",
+  "request_purpose": "Uzupełnienie zapasów dla punktu dystrybucji.",
+  "request_date_required": "2026-05-06 12:00",
+  "request_requester": "Karolina Mazur",
+  "request_comments": "Pilne zapotrzebowanie przed planowaną dystrybucją.",
+  "commitment_from_facility": "MS Warehouse (Warehouse)",
+  "commitment_request": "REQ-2026-305",
+  "commitment_date": "2026-05-03 10:00",
+  "commitment_date_available": "2026-05-04 09:00",
+  "commitment_committed_by": "Michal Stepien",
+  "commitment_comments": "Zobowiazanie obejmuje czesc potrzeb wskazanego requestu.",
+  "distribution_organization": "Timor-Leste Red Cross Society",
+  "distribution_date": "2026-05-05",
+  "distribution_staff_member": "P M",
+  "distribution_recipient": "Alicja Kaczmarek",
+  "stock_count_comments": "Spis kontrolny przed zamknieciem zmiany."
+}

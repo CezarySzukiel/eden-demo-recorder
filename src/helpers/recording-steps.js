@@ -1,9 +1,9 @@
 const { expect } = require('playwright/test');
 const {
   DEFAULT_CAPTION_DELAY_MS,
-  describeOnly,
   navigateViaHref,
 } = require('./eden-demo');
+const { runDescribedField } = require('./organization-flow');
 
 async function showPageStep(page, step, defaults = {}) {
   await navigateViaHref(page, step.href, step.description, {
@@ -14,11 +14,16 @@ async function showPageStep(page, step, defaults = {}) {
 
 async function describeFormFields(page, fields, defaults = {}) {
   for (const field of fields) {
-    await describeOnly(
-      page.locator(field.selector),
-      field.description,
-      field.delay ?? defaults.delay,
-    );
+    await runDescribedField(page, {
+      action: field.action ?? 'describe',
+      selector: field.selector,
+      description: field.description,
+      value: field.value,
+      match: field.match,
+      fallbackSelect: field.fallbackSelect,
+      ifVisible: field.ifVisible,
+      delay: field.delay ?? defaults.delay,
+    });
   }
 }
 

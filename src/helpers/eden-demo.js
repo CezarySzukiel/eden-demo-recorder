@@ -307,49 +307,133 @@ async function showCaptionAfterNavigation(page, text, delay = DEFAULT_CAPTION_DE
   await holdCaption(page, caption);
 }
 
+function normalizeNavigationTarget(value) {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value, 'http://example.invalid');
+    const normalizedPath = url.pathname.replace(/\/+$/, '') || '/';
+    const normalizedSearch = url.search || '';
+    return `${normalizedPath}${normalizedSearch}`;
+  } catch (error) {
+    return null;
+  }
+}
+
+async function findVisibleHrefTrigger(page, hrefs) {
+  for (const candidate of hrefs) {
+    const exactTrigger = page.locator(`a[href="${candidate}"]:visible`).first();
+    if (await exactTrigger.count()) {
+      return exactTrigger;
+    }
+  }
+
+  const normalizedTargets = hrefs
+    .map(normalizeNavigationTarget)
+    .filter((value) => value);
+
+  if (!normalizedTargets.length) {
+    return null;
+  }
+
+  const visibleLinks = page.locator('a[href]:visible');
+  const matchIndex = await visibleLinks.evaluateAll((elements, targets) => {
+    function normalizeNavigationTarget(value) {
+      if (!value) {
+        return null;
+      }
+
+      try {
+        const url = new URL(value, 'http://example.invalid');
+        const normalizedPath = url.pathname.replace(/\/+$/, '') || '/';
+        const normalizedSearch = url.search || '';
+        return `${normalizedPath}${normalizedSearch}`;
+      } catch (error) {
+        return null;
+      }
+    }
+
+    return elements.findIndex((element) => {
+      const hrefValue = element.getAttribute('href');
+      const normalizedHref = normalizeNavigationTarget(hrefValue);
+      return normalizedHref ? targets.includes(normalizedHref) : false;
+    });
+  }, normalizedTargets);
+
+  if (matchIndex !== -1) {
+    return visibleLinks.nth(matchIndex);
+  }
+
+  return null;
+}
+
+async function navigateDirectly(page, href, description, options = {}) {
+  await page.goto(href, { waitUntil: 'domcontentloaded' });
+
+  if (options.destination) {
+    await options.destination.waitFor({ state: 'visible', timeout: NAVIGATION_DESTINATION_TIMEOUT_MS });
+  }
+
+  await page.waitForLoadState('networkidle');
+  if (description) {
+    await showCaptionAfterNavigation(page, description, options.delay ?? DEFAULT_CAPTION_DELAY_MS);
+    return;
+  }
+
+  await page.waitForTimeout(options.delay ?? DEFAULT_CAPTION_DELAY_MS);
+}
+
 async function runNavigationStep({ page, trigger, destination, description, delay = DEFAULT_CAPTION_DELAY_MS }) {
   await trigger.waitFor({ state: 'visible', timeout: NAVIGATION_WAIT_TIMEOUT_MS });
   const clickTarget = await moveDemoCursor(trigger);
   await page.waitForTimeout(NAVIGATION_CLICK_PAUSE_MS);
-  await triggerDemoCursorClick(page);
-  await page.waitForTimeout(NAVIGATION_POST_CLICK_MS);
   if (clickTarget) {
+    await triggerDemoCursorClick(page);
     await page.mouse.click(clickTarget.x, clickTarget.y);
   } else {
+    await triggerDemoCursorClick(page);
     await trigger.click();
   }
+  await page.waitForTimeout(NAVIGATION_POST_CLICK_MS);
 
   if (destination) {
     await destination.waitFor({ state: 'visible', timeout: NAVIGATION_DESTINATION_TIMEOUT_MS });
   }
   await page.waitForLoadState('networkidle');
-  await showCaptionAfterNavigation(page, description, delay);
+  if (description) {
+    await showCaptionAfterNavigation(page, description, delay);
+    return;
+  }
+
+  await page.waitForTimeout(delay);
 }
 
 async function navigateViaHref(page, href, description, options = {}) {
   const hrefs = Array.isArray(href) ? href : [href];
+  const directFallbackHref = hrefs[0];
   let trigger = null;
-  let chosenHref = hrefs[0];
 
-  for (const candidate of hrefs) {
-    const visibleTrigger = page.locator(`a[href="${candidate}"]:visible`).first();
-    if (await visibleTrigger.count()) {
-      trigger = visibleTrigger;
-      chosenHref = candidate;
-      break;
-    }
-    const anyTrigger = page.locator(`a[href="${candidate}"]`).first();
-    if (await anyTrigger.count()) {
-      trigger = anyTrigger;
-      chosenHref = candidate;
-      break;
+  if (options.triggerSelector) {
+    const explicitTrigger = page.locator(`${options.triggerSelector}:visible`).first();
+    if (await explicitTrigger.count()) {
+      trigger = explicitTrigger;
     }
   }
 
   if (!trigger) {
-    await page.goto(chosenHref, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
-    await showCaptionAfterNavigation(page, description, options.delay ?? DEFAULT_CAPTION_DELAY_MS);
+    trigger = await findVisibleHrefTrigger(page, hrefs);
+  }
+
+  if (!trigger) {
+    if (options.allowDirectNavigation === false || !directFallbackHref) {
+      throw new Error(
+        `No visible navigation trigger found for ${hrefs.join(', ')} on ${page.url()}.`
+      );
+    }
+
+    await navigateDirectly(page, directFallbackHref, description, options);
     return;
   }
 
@@ -459,17 +543,113 @@ async function pacedSelect(locator, value) {
   await locator.page().waitForTimeout(ACTION_DELAY_MS);
 }
 
-async function selectOptionContainingText(locator, text) {
-  const value = await locator.evaluate((select, matchText) => {
-    const option = Array.from(select.options).find((entry) => entry.textContent.includes(matchText));
+async function findMatchingOptionValue(locator, matcher, matchMode = 'exact') {
+  return locator.evaluate((select, { requestedMatcher, requestedMatchMode }) => {
+    function normalize(value) {
+      return typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : '';
+    }
+
+    function isSelectableOption(entry) {
+      const optionValue = entry.value ? entry.value.trim() : '';
+      const optionText = normalize(entry.textContent);
+      if (!optionValue || !optionText) {
+        return false;
+      }
+      if (/^select\b/i.test(optionText)) {
+        return false;
+      }
+      if (/^-+$/.test(optionText)) {
+        return false;
+      }
+      return true;
+    }
+
+    function matchesOption(entry) {
+      if (!isSelectableOption(entry)) {
+        return false;
+      }
+
+      const optionValue = entry.value ? entry.value.trim() : '';
+      const optionText = normalize(entry.textContent);
+
+      if (requestedMatchMode === 'contains') {
+        const matchText = normalize(requestedMatcher);
+        return matchText ? optionText.includes(matchText) : false;
+      }
+
+      if (requestedMatcher && typeof requestedMatcher === 'object') {
+        if (typeof requestedMatcher.value === 'string' && optionValue === requestedMatcher.value.trim()) {
+          return true;
+        }
+
+        if (typeof requestedMatcher.label === 'string' && optionText === normalize(requestedMatcher.label)) {
+          return true;
+        }
+
+        if (typeof requestedMatcher.index === 'number') {
+          const options = Array.from(select.options);
+          return options[requestedMatcher.index] === entry;
+        }
+
+        return false;
+      }
+
+      const exactText = normalize(requestedMatcher);
+      if (!exactText) {
+        return false;
+      }
+
+      return optionValue === exactText || optionText === exactText;
+    }
+
+    const option = Array.from(select.options).find(matchesOption);
     return option ? option.value : null;
-  }, text);
+  }, { requestedMatcher: matcher, requestedMatchMode: matchMode });
+}
+
+async function selectOptionContainingText(locator, text) {
+  const value = await findMatchingOptionValue(locator, text, 'contains');
 
   if (!value) {
-    throw new Error(`Could not find option containing text: ${text}`);
+    await selectFirstAvailableOption(locator);
+    return;
   }
 
   await locator.selectOption(value);
+}
+
+async function selectFirstAvailableOption(locator) {
+  const value = await locator.evaluate((select) => {
+    function normalize(optionText) {
+      return typeof optionText === 'string' ? optionText.replace(/\s+/g, ' ').trim() : '';
+    }
+
+    const option = Array.from(select.options).find((entry) => {
+      const optionValue = entry.value ? entry.value.trim() : '';
+      const optionText = normalize(entry.textContent);
+      if (!optionValue || !optionText) {
+        return false;
+      }
+      if (/^select\b/i.test(optionText)) {
+        return false;
+      }
+      if (/^-+$/.test(optionText)) {
+        return false;
+      }
+      return true;
+    });
+    return option ? option.value : null;
+  });
+
+  if (!value) {
+    throw new Error('Could not find a selectable fallback option');
+  }
+
+  await locator.selectOption(value);
+}
+
+function shouldSkipUnavailableSelect(step) {
+  return step.fallbackSelect === 'skip' || step.fallbackSelect === 'firstAvailableOrSkip';
 }
 
 async function runFieldStep(locator, step) {
@@ -507,9 +687,51 @@ async function runFieldStep(locator, step) {
   if (step.action === 'select') {
     await locator.click();
     if (step.match === 'contains') {
-      await selectOptionContainingText(locator, step.value);
+      try {
+        await selectOptionContainingText(locator, step.value);
+      } catch (error) {
+        if (step.fallbackSelect !== 'firstAvailable' && step.fallbackSelect !== 'firstAvailableOrSkip') {
+          if (shouldSkipUnavailableSelect(step)) {
+            await holdCaption(page, caption);
+            return;
+          }
+          throw error;
+        }
+        try {
+          await selectFirstAvailableOption(locator);
+        } catch (fallbackError) {
+          if (shouldSkipUnavailableSelect(step)) {
+            await holdCaption(page, caption);
+            return;
+          }
+          throw fallbackError;
+        }
+      }
     } else {
-      await locator.selectOption(step.value);
+      try {
+        const exactValue = await findMatchingOptionValue(locator, step.value);
+        if (!exactValue) {
+          throw new Error(`Could not find option matching ${JSON.stringify(step.value)}`);
+        }
+        await locator.selectOption(exactValue);
+      } catch (error) {
+        if (step.fallbackSelect !== 'firstAvailable' && step.fallbackSelect !== 'firstAvailableOrSkip') {
+          if (shouldSkipUnavailableSelect(step)) {
+            await holdCaption(page, caption);
+            return;
+          }
+          throw error;
+        }
+        try {
+          await selectFirstAvailableOption(locator);
+        } catch (fallbackError) {
+          if (shouldSkipUnavailableSelect(step)) {
+            await holdCaption(page, caption);
+            return;
+          }
+          throw fallbackError;
+        }
+      }
     }
     await locator.page().waitForTimeout(ACTION_DELAY_MS);
     await holdCaption(page, caption);
@@ -523,8 +745,8 @@ async function describeAndFill(locator, description, value) {
   await runFieldStep(locator, { action: 'fill', description, value });
 }
 
-async function describeAndSelect(locator, description, value, match = 'exact') {
-  await runFieldStep(locator, { action: 'select', description, value, match });
+async function describeAndSelect(locator, description, value, match = 'exact', fallbackSelect) {
+  await runFieldStep(locator, { action: 'select', description, value, match, fallbackSelect });
 }
 
 async function describeAndClick(locator, description) {
@@ -584,10 +806,12 @@ async function registerUser(page, user) {
 
 async function loginUser(page, user) {
   await page.goto('/eden/default/user/login', { waitUntil: 'domcontentloaded' });
-  await expect(page.locator('#auth_user_email')).toBeVisible();
-  await pacedFill(page.locator('#auth_user_email'), user.email);
-  await pacedFill(page.locator('#auth_user_password'), user.password);
-  await pacedClick(page.locator('input[type="submit"][value="Login"]'));
+  await page.locator('#auth_user_email').fill(user.email);
+  await page.locator('#auth_user_password').fill(user.password);
+  await Promise.all([
+    page.waitForURL(/\/eden\/default\/index$/),
+    page.locator('input[type="submit"][value="Login"]').click(),
+  ]);
 
   await expect(page).toHaveURL(/\/eden\/default\/index$/);
   await expect(page.getByRole('menuitem', { name: 'Organizations' })).toBeVisible();

@@ -8,6 +8,7 @@ Scenariusze Playwright do nagrywania przewodnikow po Sahana Eden.
 - `npm run organizations` - nagrywa scenariusz organizacja + biuro + facility
 - `npm run warehouses` - nagrywa przewodnik po module Warehouses
 - `npm run warehouses_extended` - nagrywa rozszerzony przewodnik po Warehouses (teksty z `src/locale/warehouse/pl_gpt.json`)
+- `npm run warehouses_overview` - nagrywa szybki przeglad glownej nawigacji w Warehouses (1 sekunda na zakladke)
 
 Domyslny adres aplikacji:
 
@@ -94,5 +95,6 @@ Nagrania sa zapisywane jako stale pliki:
 - `artifacts/demo-results/organization-setup.webm`
 - `artifacts/demo-results/warehouses-guide.webm`
 - `artifacts/demo-results/warehouses-extended.webm`
+- `artifacts/demo-results/warehouses-overview.webm`
 
 Ponowne uruchomienie tego samego nagrania nadpisuje tylko jego wlasny plik.

@@ -45,7 +45,7 @@ async function runDescribedField(page, step) {
   }
 
   if (step.action === 'select') {
-    await describeAndSelect(locator, step.description, step.value, step.match);
+    await describeAndSelect(locator, step.description, step.value, step.match, step.fallbackSelect);
     return;
   }
 
