@@ -1,6 +1,6 @@
 const path = require('path');
 const { test } = require('playwright/test');
-const locale = require('../locale/organizations/pl.json');
+const locale = require('../locale/organizations/en.json');
 const { RECORDING_VIEWPORT } = require('../helpers/recording-size');
 const { buildOrganizationSetupStory } = require('./organization-setup.story');
 const {

@@ -1,7 +1,7 @@
 const path = require('path');
 const { test, expect } = require('playwright/test');
-const locale = require('../locale/warehouse/pl_short.json');
-const values = require('../locale/warehouse/pl_values.json');
+const locale = require('../locale/warehouse/en.json');
+const values = require('../locale/warehouse/en_values.json');
 const { localeText } = require('../helpers/locale');
 const { RECORDING_VIEWPORT } = require('../helpers/recording-size');
 const {
@@ -13,6 +13,8 @@ const {
   buildDemoContent,
   clearDemoCaption,
   describeAndClick,
+  describeAndFill,
+  describeAndSelect,
   describeOnly,
   enableDemoCaptions,
   enableDemoCursor,
@@ -50,6 +52,10 @@ function field(selector, key, fallback, options = {}) {
     ifVisible: options.ifVisible,
     delay: options.delay,
   };
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 function resolveField(fieldConfig) {
@@ -124,6 +130,27 @@ async function showLocaleCreateFormStep(page, sectionHref, sectionKey, sectionFa
   );
 }
 
+async function fillAutocompleteItem(page, {
+  inputSelector,
+  description,
+  typedValue,
+  suggestionText,
+  suggestionDescription,
+  hiddenValueSelector,
+}) {
+  await describeAndFill(page.locator(inputSelector), description, typedValue);
+  const suggestion = page
+    .locator('ul.ui-autocomplete li')
+    .filter({ hasText: new RegExp(`^${escapeRegExp(suggestionText)}$`, 'i') })
+    .first();
+  await expect(suggestion).toBeVisible();
+  await describeAndClick(suggestion, suggestionDescription);
+
+  if (hiddenValueSelector) {
+    await expect(page.locator(hiddenValueSelector)).not.toHaveValue('');
+  }
+}
+
 async function createSetupOrganization(page, organizationName) {
   await page.goto('/eden/org/organisation/create', { waitUntil: 'domcontentloaded' });
   await page.waitForLoadState('networkidle');
@@ -184,8 +211,8 @@ test('records warehouses extended guide', async ({ browser, baseURL }) => {
     'Przechodzimy do formularza tworzenia typu magazynu.',
     '#inv_warehouse_type_name',
     [
-      fillField('#inv_warehouse_type_name', 'warehouse_type_name', 'Name — nazwa typu magazynu, np. magazyn centralny, chłodnia albo magazyn polowy.'),
-      fillField('#inv_warehouse_type_comments', 'warehouse_type_comments', 'Comments — opis typu magazynu i zasad jego użycia.'),
+      fillField('#inv_warehouse_type_name', 'warehouse_type_name', 'Warehouse type name, for example a central warehouse, cold room, or field warehouse.'),
+      fillField('#inv_warehouse_type_comments', 'warehouse_type_comments', 'Comments describing the warehouse type and how it should be used.'),
     ],
   );
 
@@ -401,6 +428,109 @@ test('records warehouses extended guide', async ({ browser, baseURL }) => {
   await describeLocaleFormFields(page, [
     fillField('#inv_adj_comments', 'stock_count_comments', 'Uwagi do spisu.'),
   ]);
+
+  await showLocalePageStep(
+    page,
+    '/eden/inv/adj',
+    t(
+      'stock_count_back_to_list',
+      'We return to the stock count list to open a real record for the facility Distribution Point org-moektc0p.',
+    ),
+  );
+
+  const stockCountRow = page
+    .locator('table tbody tr')
+    .filter({ hasText: 'Distribution Point org-moektc0p (Facility)' })
+    .last();
+  await expect(stockCountRow).toBeVisible();
+  await describeAndClick(
+    stockCountRow.locator('a.action-btn').first(),
+    t(
+      'stock_count_existing_record',
+      'We open the latest stock count for Distribution Point org-moektc0p to continue with item-level adjustments.',
+    ),
+  );
+  await expect(page).toHaveURL(/\/eden\/inv\/adj\/\d+\/update$/);
+  await page.waitForLoadState('networkidle');
+
+  await describeAndClick(
+    page.locator('#rheader_tab_adj_item'),
+    t(
+      'stock_count_items_tab',
+      'The Items tab is where we add counted products and record their revised quantities.',
+    ),
+  );
+  await expect(page).toHaveURL(/\/eden\/inv\/adj\/\d+\/adj_item$/);
+  await page.waitForLoadState('networkidle');
+
+  await describeAndClick(
+    page.locator('#show-add-btn'),
+    t(
+      'stock_count_add_item',
+      'Add Item to Stock opens the inline form for entering the counted item and the revised stock details.',
+    ),
+  );
+  await expect(page.locator('#list-add')).toBeVisible();
+  await expect(page.locator('#list-add h3')).toContainText('Add Item to Stock');
+  await fillAutocompleteItem(page, {
+    inputSelector: '#dummy_inv_adj_item_item_id',
+    description: t('stock_count_item', 'Item — choose the product that should be added or corrected in this stock count.'),
+    typedValue: 'blanket',
+    suggestionText: 'blanket',
+    suggestionDescription: t(
+      'stock_count_item_suggestion',
+      'Select the matching item from the autocomplete suggestions so Eden links the form to the real stock item record.',
+    ),
+    hiddenValueSelector: '#inv_adj_item_item_id',
+  });
+  await expect(page.locator('#inv_adj_item_item_pack_id')).toBeEnabled();
+  await describeAndSelect(
+    page.locator('#inv_adj_item_item_pack_id'),
+    t('stock_count_pack', 'Pack — select the unit or pack size for the counted item.'),
+    { label: 'piece' },
+  );
+  await describeAndFill(
+    page.locator('#inv_adj_item_new_quantity'),
+    t('stock_count_revised_quantity', 'Revised Quantity — enter the quantity that was actually counted during the stock check.'),
+    '24',
+  );
+  await describeOnly(
+    page.locator('#inv_adj_item_reason__row .controls'),
+    t('stock_count_reason', 'Reason — Eden shows the adjustment reason that explains why the quantity is being changed.'),
+  );
+  await describeAndSelect(
+    page.locator('#inv_adj_item_new_status'),
+    t('stock_count_revised_status', 'Revised Status — note whether the counted stock stays normal, becomes surplus, or needs disposal.'),
+    { label: 'Surplus' },
+  );
+  await describeAndFill(
+    page.locator('#inv_adj_item_expiry_date'),
+    t('stock_count_expiry_date', 'Expiry Date — record the expiration date when the item needs batch or shelf-life tracking.'),
+    '2026-12-31',
+  );
+  await describeAndFill(
+    page.locator('#inv_adj_item_bin'),
+    t('stock_count_bin', 'Bin — capture the exact shelf, rack, or bin location inside the facility.'),
+    'Rack B-12',
+  );
+  await describeAndSelect(
+    page.locator('#inv_adj_item_new_owner_org_id'),
+    t('stock_count_transfer_owner', 'Transfer Ownership To — use this when the stock is physically here but should belong to a specific organization or branch.'),
+    { label: 'Demo NGO Aid Network org-moektc0p' },
+  );
+  await describeAndFill(
+    page.locator('#inv_adj_item_comments'),
+    t('stock_count_item_comments', 'Comments — add practical notes from the count, such as damage, missing labels, or follow-up actions.'),
+    'Count confirmed during the evening check.',
+  );
+  await describeAndClick(
+    page.locator('#submit_record__row input[type="submit"][value="Save"]').first(),
+    t('stock_count_save_item', 'Finally, save the item line to attach it to this stock count.'),
+  );
+  await page.waitForLoadState('networkidle');
+  await expect(
+    page.locator('table tbody tr').filter({ hasText: 'Rack B-12' }).first(),
+  ).toBeVisible();
 
   await showLocalePageStep(page, ['/eden/inv/inv_item/report', '/eden/inv/inv_item'], t('section_reports', 'Sekcja Reports.'));
   await showStandaloneCaption(page, t('report_warehouse_stock', 'Raport stanów magazynowych.'), 1800);
