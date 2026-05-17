@@ -1,9 +1,37 @@
+/**
+ * @fileoverview Core demo automation helpers for Sahana Eden recordings.
+ *
+ * Provides functions for cursor animation, caption display, form interactions,
+ * navigation, and video recording. All timing and animation parameters are
+ * configurable via environment variables.
+ */
+
 const { expect } = require('playwright/test');
 const fs = require('fs');
 const path = require('path');
 
+/**
+ * WeakMap to track caption state per page for timing calculations.
+ * @type {WeakMap<import('playwright').Page, Object>}
+ */
 const captionState = new WeakMap();
 
+/**
+ * Magic numbers used for cursor positioning and caption timing.
+ */
+const CURSOR_OFFSET_X = 24;
+const CURSOR_OFFSET_Y = 16;
+const MIN_WORD_LENGTH = 3;
+
+/**
+ * Parses the repository .env file using the project's intentionally small
+ * key=value format.
+ *
+ * Environment variables from process.env still win; this parser only provides
+ * local fallback values for demo scripts without introducing dotenv semantics.
+ *
+ * @returns {Object<string, string>} Parsed environment values.
+ */
 function parseEnvFile() {
   const envPath = path.join(process.cwd(), '.env');
   const values = {};
@@ -34,6 +62,12 @@ function parseEnvFile() {
 
 const ENV_VALUES = parseEnvFile();
 
+/**
+ * Retrieves environment variable value.
+ *
+ * @param {string} name - Environment variable name.
+ * @returns {string|undefined} Environment variable value or undefined.
+ */
 function getEnvValue(name) {
   if (process.env[name] !== undefined) {
     return process.env[name];
@@ -41,6 +75,13 @@ function getEnvValue(name) {
   return ENV_VALUES[name];
 }
 
+/**
+ * Gets required numeric environment variable.
+ *
+ * @param {string} name - Environment variable name.
+ * @returns {number} Parsed numeric value.
+ * @throws {Error} If variable is missing or not a valid number.
+ */
 function getRequiredNumberEnv(name) {
   const rawValue = getEnvValue(name);
   const parsed = Number(rawValue);
@@ -52,6 +93,13 @@ function getRequiredNumberEnv(name) {
   return parsed;
 }
 
+/**
+ * Gets required string environment variable.
+ *
+ * @param {string} name - Environment variable name.
+ * @returns {string} Environment variable value.
+ * @throws {Error} If variable is missing or empty.
+ */
 function getRequiredStringEnv(name) {
   const value = getEnvValue(name);
   if (!value) {
@@ -81,6 +129,28 @@ const NAVIGATION_DESTINATION_TIMEOUT_MS = getRequiredNumberEnv('EDEN_NAVIGATION_
 const RECORDING_FINISH_DELAY_MS = getRequiredNumberEnv('EDEN_RECORDING_FINISH_DELAY_MS');
 const USER_PASSWORD = getRequiredStringEnv('EDEN_TEST_PASSWORD');
 
+/**
+ * Builds unique demo content with timestamp-based suffix.
+ *
+ * Generates unique names for organizations, offices, and facilities
+ * to avoid conflicts when running multiple tests.
+ *
+ * @param {string} [prefix='demo'] - Prefix for the generated suffix.
+ * @returns {Object} Object containing unique names for demo entities.
+ * @returns {string} return.suffix - The generated suffix.
+ * @returns {string} return.organizationName - Unique organization name.
+ * @returns {string} return.officeName - Unique office name.
+ * @returns {string} return.facilityName - Unique facility name.
+ * @returns {string} return.resourceTypeName - Unique resource type name.
+ *
+ * @example
+ * const content = buildDemoContent('test');
+ * // Returns: {
+ * //   suffix: 'test-abc123',
+ * //   organizationName: 'Demo NGO Aid Network test-abc123',
+ * //   ...
+ * // }
+ */
 function buildDemoContent(prefix = 'demo') {
   const stamp = Date.now().toString(36);
   const suffix = `${prefix}-${stamp}`;
@@ -93,6 +163,20 @@ function buildDemoContent(prefix = 'demo') {
   };
 }
 
+/**
+ * Enables custom demo cursor on the page.
+ *
+ * Injects client-side script that creates a custom cursor element
+ * and exposes global functions for cursor movement and click animation.
+ * Must be called before page navigation.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await enableDemoCursor(page);
+ * await page.goto('/eden/org/index');
+ */
 async function enableDemoCursor(page) {
   await page.addInitScript((cursorClickVisualMs) => {
     if (window.__edenDemoCursorInstalled) {
@@ -157,6 +241,20 @@ async function enableDemoCursor(page) {
   }, CURSOR_CLICK_VISUAL_MS);
 }
 
+/**
+ * Enables custom demo captions on the page.
+ *
+ * Injects client-side script that creates a caption element at the bottom
+ * of the page and exposes global functions for showing/hiding captions.
+ * Must be called before page navigation.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await enableDemoCaptions(page);
+ * await page.goto('/eden/org/index');
+ */
 async function enableDemoCaptions(page) {
   await page.addInitScript(() => {
     if (window.__edenDemoCaptionsInstalled) {
@@ -224,6 +322,21 @@ async function enableDemoCaptions(page) {
   });
 }
 
+/**
+ * Moves demo cursor to a locator's position.
+ *
+ * Scrolls the element into view, calculates target position (slightly offset
+ * from center for better visual effect), and animates cursor movement.
+ *
+ * @param {import('playwright').Locator} locator - Target element locator.
+ * @returns {Promise<{x: number, y: number}|null>} Cursor position or null if element has no bounding box.
+ *
+ * @example
+ * const position = await moveDemoCursor(page.locator('#submit-button'));
+ * if (position) {
+ *   await page.mouse.click(position.x, position.y);
+ * }
+ */
 async function moveDemoCursor(locator) {
   const page = locator.page();
   await locator.scrollIntoViewIfNeeded();
@@ -232,19 +345,33 @@ async function moveDemoCursor(locator) {
     return null;
   }
 
-  const targetX = box.x + Math.min(box.width / 2, 24);
-  const targetY = box.y + Math.min(box.height / 2, 16);
+  const targetX = box.x + Math.min(box.width / 2, CURSOR_OFFSET_X);
+  const targetY = box.y + Math.min(box.height / 2, CURSOR_OFFSET_Y);
 
   await page.mouse.move(targetX, targetY, { steps: CURSOR_MOVE_STEPS });
   await page.waitForTimeout(CURSOR_MOVE_SETTLE_MS);
   return { x: targetX, y: targetY };
 }
 
+/**
+ * Calculates minimum caption display time based on word count.
+ *
+ * Counts words longer than MIN_WORD_LENGTH characters and multiplies
+ * by SECONDS_PER_WORD to ensure captions stay visible long enough to read.
+ *
+ * @param {string} text - Caption text to analyze.
+ * @param {number} [fallback=DEFAULT_CAPTION_DELAY_MS] - Minimum delay if no long words.
+ * @returns {number} Calculated delay in milliseconds, capped at MAX_CAPTION_DELAY_MS.
+ *
+ * @example
+ * const delay = getCaptionMinimumDelay('This is a test caption');
+ * // Returns: calculated delay based on word count
+ */
 function getCaptionMinimumDelay(text, fallback = DEFAULT_CAPTION_DELAY_MS) {
   const longWords = text
     .split(/\s+/)
     .map((word) => word.trim())
-    .filter((word) => word.length > 3);
+    .filter((word) => word.length > MIN_WORD_LENGTH);
 
   if (!longWords.length) {
     return fallback;
@@ -256,6 +383,16 @@ function getCaptionMinimumDelay(text, fallback = DEFAULT_CAPTION_DELAY_MS) {
   );
 }
 
+/**
+ * Shows demo caption by calling injected client-side function.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string} text - Caption text to display.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await showDemoCaption(page, 'Creating new organization');
+ */
 async function showDemoCaption(page, text) {
   await page.evaluate((value) => {
     if (window.__edenDemoCaptionShow) {
@@ -264,6 +401,16 @@ async function showDemoCaption(page, text) {
   }, text);
 }
 
+/**
+ * Begins caption timing state for a page.
+ *
+ * Stores caption state in WeakMap for later timing calculations.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string} text - Caption text.
+ * @param {number} [delay=DEFAULT_CAPTION_DELAY_MS] - Base delay duration.
+ * @returns {Object} Caption state object with text, delay, and startedAt timestamp.
+ */
 function beginCaption(page, text, delay = DEFAULT_CAPTION_DELAY_MS) {
   const state = {
     text,
@@ -274,6 +421,18 @@ function beginCaption(page, text, delay = DEFAULT_CAPTION_DELAY_MS) {
   return state;
 }
 
+/**
+ * Waits for minimum caption display time to elapse.
+ *
+ * Calculates remaining time based on word count and elapsed time,
+ * then waits if necessary to ensure caption is visible long enough.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {Object|string} captionOrText - Caption state object or text string.
+ * @param {number} [delay=DEFAULT_CAPTION_DELAY_MS] - Base delay if captionOrText is string.
+ * @param {number} [startedAt=Date.now()] - Start timestamp if captionOrText is string.
+ * @returns {Promise<void>}
+ */
 async function waitForCaptionMinimum(page, captionOrText, delay = DEFAULT_CAPTION_DELAY_MS, startedAt = Date.now()) {
   const state = typeof captionOrText === 'string'
     ? { text: captionOrText, delay, startedAt }
@@ -287,26 +446,77 @@ async function waitForCaptionMinimum(page, captionOrText, delay = DEFAULT_CAPTIO
   }
 }
 
+/**
+ * Shows caption and returns state for later timing control.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string} text - Caption text to display.
+ * @param {number} [delay=DEFAULT_CAPTION_DELAY_MS] - Base delay duration.
+ * @returns {Promise<Object>} Caption state object.
+ */
 async function showCaption(page, text, delay = DEFAULT_CAPTION_DELAY_MS) {
   const state = beginCaption(page, text, delay);
   await showDemoCaption(page, text);
   return state;
 }
 
+/**
+ * Waits for caption minimum display time.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {Object} caption - Caption state object from showCaption().
+ * @returns {Promise<void>}
+ */
 async function holdCaption(page, caption) {
   await waitForCaptionMinimum(page, caption);
 }
 
+/**
+ * Shows caption and waits for minimum display time.
+ *
+ * Convenience function that combines showCaption() and holdCaption().
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string} text - Caption text to display.
+ * @param {number} [delay=DEFAULT_CAPTION_DELAY_MS] - Base delay duration.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await showStandaloneCaption(page, 'Welcome to Warehouses module', 3000);
+ */
 async function showStandaloneCaption(page, text, delay = DEFAULT_CAPTION_DELAY_MS) {
   const caption = await showCaption(page, text, delay);
   await holdCaption(page, caption);
 }
 
+/**
+ * Shows caption after navigation and waits for minimum display time.
+ *
+ * Alias for showStandaloneCaption() for semantic clarity in navigation contexts.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string} text - Caption text to display.
+ * @param {number} [delay=DEFAULT_CAPTION_DELAY_MS] - Base delay duration.
+ * @returns {Promise<void>}
+ */
 async function showCaptionAfterNavigation(page, text, delay = DEFAULT_CAPTION_DELAY_MS) {
   const caption = await showCaption(page, text, delay);
   await holdCaption(page, caption);
 }
 
+/**
+ * Normalizes navigation target URL for comparison.
+ *
+ * Removes trailing slashes from pathname and extracts pathname + search.
+ * Used to match hrefs that may differ in trailing slash formatting.
+ *
+ * @param {string} value - URL or href to normalize.
+ * @returns {string|null} Normalized pathname+search or null if invalid.
+ *
+ * @example
+ * normalizeNavigationTarget('/eden/org/organisation/');
+ * // Returns: '/eden/org/organisation'
+ */
 function normalizeNavigationTarget(value) {
   if (!value) {
     return null;
@@ -322,6 +532,22 @@ function normalizeNavigationTarget(value) {
   }
 }
 
+/**
+ * Finds visible link element matching one of the provided hrefs.
+ *
+ * First tries exact href match, then falls back to normalized pathname+search
+ * comparison to handle trailing slash differences.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string[]} hrefs - Array of href values to search for.
+ * @returns {Promise<import('playwright').Locator|null>} Matching link locator or null.
+ *
+ * @example
+ * const trigger = await findVisibleHrefTrigger(page, [
+ *   '/eden/org/organisation',
+ *   '/eden/org/organisation/'
+ * ]);
+ */
 async function findVisibleHrefTrigger(page, hrefs) {
   for (const candidate of hrefs) {
     const exactTrigger = page.locator(`a[href="${candidate}"]:visible`).first();
@@ -340,11 +566,11 @@ async function findVisibleHrefTrigger(page, hrefs) {
 
   const visibleLinks = page.locator('a[href]:visible');
   const matchIndex = await visibleLinks.evaluateAll((elements, targets) => {
-    function normalizeNavigationTarget(value) {
+    // Inline normalization function for browser context
+    function normalizeHref(value) {
       if (!value) {
         return null;
       }
-
       try {
         const url = new URL(value, 'http://example.invalid');
         const normalizedPath = url.pathname.replace(/\/+$/, '') || '/';
@@ -357,7 +583,7 @@ async function findVisibleHrefTrigger(page, hrefs) {
 
     return elements.findIndex((element) => {
       const hrefValue = element.getAttribute('href');
-      const normalizedHref = normalizeNavigationTarget(hrefValue);
+      const normalizedHref = normalizeHref(hrefValue);
       return normalizedHref ? targets.includes(normalizedHref) : false;
     });
   }, normalizedTargets);
@@ -369,6 +595,19 @@ async function findVisibleHrefTrigger(page, hrefs) {
   return null;
 }
 
+/**
+ * Navigates directly to URL without clicking a trigger element.
+ *
+ * Used as fallback when no visible navigation trigger is found.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string} href - Target URL to navigate to.
+ * @param {string} description - Caption text to display after navigation.
+ * @param {Object} [options={}] - Navigation options.
+ * @param {import('playwright').Locator} [options.destination] - Element to wait for after navigation.
+ * @param {number} [options.delay] - Caption display duration.
+ * @returns {Promise<void>}
+ */
 async function navigateDirectly(page, href, description, options = {}) {
   await page.goto(href, { waitUntil: 'domcontentloaded' });
 
@@ -385,6 +624,20 @@ async function navigateDirectly(page, href, description, options = {}) {
   await page.waitForTimeout(options.delay ?? DEFAULT_CAPTION_DELAY_MS);
 }
 
+/**
+ * Executes a navigation step with cursor animation and caption.
+ *
+ * Moves cursor to trigger, shows click animation, clicks, waits for destination,
+ * and displays caption.
+ *
+ * @param {Object} params - Navigation parameters.
+ * @param {import('playwright').Page} params.page - The Playwright page object.
+ * @param {import('playwright').Locator} params.trigger - Element to click for navigation.
+ * @param {import('playwright').Locator} params.destination - Element to wait for after navigation.
+ * @param {string} params.description - Caption text to display.
+ * @param {number} [params.delay=DEFAULT_CAPTION_DELAY_MS] - Caption display duration.
+ * @returns {Promise<void>}
+ */
 async function runNavigationStep({ page, trigger, destination, description, delay = DEFAULT_CAPTION_DELAY_MS }) {
   await trigger.waitFor({ state: 'visible', timeout: NAVIGATION_WAIT_TIMEOUT_MS });
   const clickTarget = await moveDemoCursor(trigger);
@@ -410,6 +663,35 @@ async function runNavigationStep({ page, trigger, destination, description, dela
   await page.waitForTimeout(delay);
 }
 
+/**
+ * Navigates via href with cursor animation and caption.
+ *
+ * Searches for visible link matching href(s), moves cursor, clicks with animation,
+ * and shows caption. Falls back to direct navigation if no trigger found.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string|string[]} href - Single href or array of href alternatives.
+ * @param {string} description - Caption text to display after navigation.
+ * @param {Object} [options={}] - Navigation options.
+ * @param {string} [options.triggerSelector] - Explicit CSS selector for trigger element.
+ * @param {import('playwright').Locator} [options.destination] - Element to wait for after navigation.
+ * @param {number} [options.delay] - Caption display duration.
+ * @param {boolean} [options.allowDirectNavigation=true] - Whether to fall back to direct navigation.
+ * @returns {Promise<void>}
+ * @throws {Error} If no trigger found and allowDirectNavigation is false.
+ *
+ * @example
+ * await navigateViaHref(page, '/eden/org/organisation', 'Opening Organizations');
+ *
+ * @example
+ * // With multiple href alternatives
+ * await navigateViaHref(
+ *   page,
+ *   ['/eden/supply/item/summary', '/eden/supply/item'],
+ *   'Viewing items',
+ *   { delay: 2000 }
+ * );
+ */
 async function navigateViaHref(page, href, description, options = {}) {
   const hrefs = Array.isArray(href) ? href : [href];
   const directFallbackHref = hrefs[0];
@@ -427,9 +709,15 @@ async function navigateViaHref(page, href, description, options = {}) {
   }
 
   if (!trigger) {
-    if (options.allowDirectNavigation === false || !directFallbackHref) {
+    if (options.allowDirectNavigation === false) {
       throw new Error(
-        `No visible navigation trigger found for ${hrefs.join(', ')} on ${page.url()}.`
+        `No visible navigation trigger found for ${hrefs.join(', ')} on ${page.url()}. Direct navigation is disabled.`
+      );
+    }
+    
+    if (!directFallbackHref) {
+      throw new Error(
+        `No visible navigation trigger found for ${hrefs.join(', ')} on ${page.url()} and no fallback href provided.`
       );
     }
 
@@ -447,6 +735,20 @@ async function navigateViaHref(page, href, description, options = {}) {
   });
 }
 
+/**
+ * Navigates via top menu item with cursor animation and caption.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string} name - Menu item accessible name.
+ * @param {string} description - Caption text to display after navigation.
+ * @param {Object} [options={}] - Navigation options.
+ * @param {import('playwright').Locator} [options.destination] - Element to wait for after navigation.
+ * @param {number} [options.delay] - Caption display duration.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await navigateViaTopMenu(page, 'Organizations', 'Opening Organizations module');
+ */
 async function navigateViaTopMenu(page, name, description, options = {}) {
   await runNavigationStep({
     page,
@@ -457,6 +759,26 @@ async function navigateViaTopMenu(page, name, description, options = {}) {
   });
 }
 
+/**
+ * Hovers cursor over element and shows description caption.
+ *
+ * Waits for element visibility, moves cursor, shows caption, and holds
+ * for minimum display time.
+ *
+ * @param {import('playwright').Locator} locator - Target element locator.
+ * @param {string} description - Caption text to display.
+ * @param {number} [delay=DEFAULT_HOVER_DELAY_MS] - Base caption delay.
+ * @param {number} [waitTimeout=FIELD_WAIT_TIMEOUT_MS] - Timeout for element visibility.
+ * @returns {Promise<void>}
+ * @throws {Error} If element not visible within timeout.
+ *
+ * @example
+ * await runHoverDescription(
+ *   page.locator('#org_logo'),
+ *   'Organization logo upload field',
+ *   2000
+ * );
+ */
 async function runHoverDescription(locator, description, delay = DEFAULT_HOVER_DELAY_MS, waitTimeout = FIELD_WAIT_TIMEOUT_MS) {
   const page = locator.page();
   await locator.waitFor({ state: 'visible', timeout: waitTimeout });
@@ -465,15 +787,52 @@ async function runHoverDescription(locator, description, delay = DEFAULT_HOVER_D
   await holdCaption(page, caption);
 }
 
+/**
+ * Tries to hover and describe element, returns false if not visible.
+ *
+ * Used for optional fields that may not be present in all configurations.
+ * Only catches timeout errors; other errors are re-thrown.
+ *
+ * @param {import('playwright').Locator} locator - Target element locator.
+ * @param {string} description - Caption text to display.
+ * @param {number} [delay=OPTIONAL_HOVER_DELAY_MS] - Base caption delay.
+ * @param {number} [waitTimeout=OPTIONAL_HOVER_WAIT_TIMEOUT_MS] - Timeout for element visibility.
+ * @returns {Promise<boolean>} True if successful, false if element not visible.
+ * @throws {Error} Re-throws non-timeout errors.
+ *
+ * @example
+ * const shown = await tryRunHoverDescription(
+ *   page.locator('#optional_field'),
+ *   'Optional field description'
+ * );
+ * if (!shown) {
+ *   console.log('Field not present, skipping');
+ * }
+ */
 async function tryRunHoverDescription(locator, description, delay = OPTIONAL_HOVER_DELAY_MS, waitTimeout = OPTIONAL_HOVER_WAIT_TIMEOUT_MS) {
   try {
     await runHoverDescription(locator, description, delay, waitTimeout);
     return true;
   } catch (error) {
-    return false;
+    // Only catch timeout errors, re-throw others
+    if (error.message && error.message.includes('Timeout')) {
+      return false;
+    }
+    throw error;
   }
 }
 
+/**
+ * Clears demo caption from page.
+ *
+ * Removes caption state and hides caption element via injected function.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await clearDemoCaption(page);
+ */
 async function clearDemoCaption(page) {
   captionState.delete(page);
   await page.evaluate(() => {
@@ -483,6 +842,14 @@ async function clearDemoCaption(page) {
   });
 }
 
+/**
+ * Triggers demo cursor click animation.
+ *
+ * Calls injected client-side function to show click visual effect.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @returns {Promise<void>}
+ */
 async function triggerDemoCursorClick(page) {
   await page.evaluate(() => {
     if (window.__edenDemoCursorClick) {
@@ -491,6 +858,21 @@ async function triggerDemoCursorClick(page) {
   });
 }
 
+/**
+ * Builds unique user credentials for registration.
+ *
+ * Generates timestamp-based email to avoid conflicts.
+ *
+ * @returns {Object} User credentials object.
+ * @returns {string} return.firstName - User first name.
+ * @returns {string} return.lastName - User last name.
+ * @returns {string} return.email - Unique email address.
+ * @returns {string} return.password - User password from environment.
+ *
+ * @example
+ * const user = buildUser();
+ * await registerUser(page, user);
+ */
 function buildUser() {
   const stamp = Date.now();
   return {
@@ -501,6 +883,20 @@ function buildUser() {
   };
 }
 
+/**
+ * Loads existing user credentials from environment variables.
+ *
+ * Used for recording tests that need to login with pre-existing account.
+ *
+ * @returns {Object} User credentials object.
+ * @returns {string} return.email - User email from EMAIL env var.
+ * @returns {string} return.password - User password from PASSWORD env var.
+ * @throws {Error} If EMAIL or PASSWORD environment variables are missing.
+ *
+ * @example
+ * const user = loadEnvCredentials();
+ * await loginUser(page, user);
+ */
 function loadEnvCredentials() {
   const email = getEnvValue('EMAIL');
   const password = getEnvValue('PASSWORD');
@@ -512,6 +908,18 @@ function loadEnvCredentials() {
   return { email, password };
 }
 
+/**
+ * Clicks element with cursor animation and paced timing.
+ *
+ * Moves cursor, shows click animation, waits, then performs actual click.
+ * Used for non-narrated clicks where only timing matters.
+ *
+ * @param {import('playwright').Locator} locator - Element to click.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await pacedClick(page.locator('input[type="submit"]'));
+ */
 async function pacedClick(locator) {
   await locator.waitFor({ state: 'visible' });
   await moveDemoCursor(locator);
@@ -521,6 +929,19 @@ async function pacedClick(locator) {
   await locator.page().waitForTimeout(ACTION_DELAY_MS);
 }
 
+/**
+ * Fills input field with cursor animation and character-by-character typing.
+ *
+ * Moves cursor, shows click animation, clears existing value, then types
+ * new value with delay between characters for realistic effect.
+ *
+ * @param {import('playwright').Locator} locator - Input element to fill.
+ * @param {string} value - Text value to type.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await pacedFill(page.locator('#org_organisation_name'), 'Test Organization');
+ */
 async function pacedFill(locator, value) {
   await locator.waitFor({ state: 'visible' });
   await moveDemoCursor(locator);
@@ -533,6 +954,18 @@ async function pacedFill(locator, value) {
   await locator.page().waitForTimeout(ACTION_DELAY_MS);
 }
 
+/**
+ * Selects option from dropdown with cursor animation and paced timing.
+ *
+ * Moves cursor, shows click animation, waits, then selects option.
+ *
+ * @param {import('playwright').Locator} locator - Select element.
+ * @param {string|Object} value - Option value or selection object.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await pacedSelect(page.locator('#country'), { label: 'Poland' });
+ */
 async function pacedSelect(locator, value) {
   await locator.waitFor({ state: 'visible' });
   await moveDemoCursor(locator);
@@ -543,6 +976,29 @@ async function pacedSelect(locator, value) {
   await locator.page().waitForTimeout(ACTION_DELAY_MS);
 }
 
+/**
+ * Finds matching option value in a select element.
+ *
+ * Supports exact match, contains match, or object matcher with value/label/index.
+ * Filters out placeholder options like "Select..." or "---".
+ *
+ * @param {import('playwright').Locator} locator - Select element locator.
+ * @param {string|Object} matcher - Value to match or object with {value, label, index}.
+ * @param {string} [matchMode='exact'] - Match mode: 'exact' or 'contains'.
+ * @returns {Promise<string|null>} Matching option value or null if not found.
+ *
+ * @example
+ * // Exact match
+ * const value = await findMatchingOptionValue(select, 'Poland');
+ *
+ * @example
+ * // Contains match
+ * const value = await findMatchingOptionValue(select, 'Demo NGO', 'contains');
+ *
+ * @example
+ * // Object matcher
+ * const value = await findMatchingOptionValue(select, { label: 'Poland' });
+ */
 async function findMatchingOptionValue(locator, matcher, matchMode = 'exact') {
   return locator.evaluate((select, { requestedMatcher, requestedMatchMode }) => {
     function normalize(value) {
@@ -555,7 +1011,8 @@ async function findMatchingOptionValue(locator, matcher, matchMode = 'exact') {
       if (!optionValue || !optionText) {
         return false;
       }
-      if (/^select\b/i.test(optionText)) {
+      // More specific regex to avoid matching "selective", "selection", etc.
+      if (/^select$/i.test(optionText) || /^select\s/i.test(optionText)) {
         return false;
       }
       if (/^-+$/.test(optionText)) {
@@ -607,6 +1064,16 @@ async function findMatchingOptionValue(locator, matcher, matchMode = 'exact') {
   }, { requestedMatcher: matcher, requestedMatchMode: matchMode });
 }
 
+/**
+ * Selects option containing text, falls back to first available.
+ *
+ * @param {import('playwright').Locator} locator - Select element locator.
+ * @param {string} text - Text to search for in option labels.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await selectOptionContainingText(page.locator('#org_id'), 'Demo NGO');
+ */
 async function selectOptionContainingText(locator, text) {
   const value = await findMatchingOptionValue(locator, text, 'contains');
 
@@ -618,6 +1085,18 @@ async function selectOptionContainingText(locator, text) {
   await locator.selectOption(value);
 }
 
+/**
+ * Selects first non-placeholder option in select element.
+ *
+ * Filters out options like "Select...", "---", or empty values.
+ *
+ * @param {import('playwright').Locator} locator - Select element locator.
+ * @returns {Promise<void>}
+ * @throws {Error} If no selectable option found.
+ *
+ * @example
+ * await selectFirstAvailableOption(page.locator('#optional_select'));
+ */
 async function selectFirstAvailableOption(locator) {
   const value = await locator.evaluate((select) => {
     function normalize(optionText) {
@@ -630,7 +1109,7 @@ async function selectFirstAvailableOption(locator) {
       if (!optionValue || !optionText) {
         return false;
       }
-      if (/^select\b/i.test(optionText)) {
+      if (/^select$/i.test(optionText) || /^select\s/i.test(optionText)) {
         return false;
       }
       if (/^-+$/.test(optionText)) {
@@ -761,12 +1240,37 @@ async function describeOnlyIfVisible(locator, description, delay = OPTIONAL_HOVE
   await tryRunHoverDescription(locator, description, delay, waitTimeout);
 }
 
+/**
+ * Saves form by clicking Save button and waiting for completion.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await saveForm(page);
+ */
 async function saveForm(page) {
   await pacedClick(page.locator('input[type="submit"][value="Save"]').first());
   await page.waitForLoadState('networkidle');
   await page.waitForTimeout(ACTION_DELAY_MS);
 }
 
+/**
+ * Saves recorded video to target location with error handling.
+ *
+ * Closes browser context, retrieves video path, and moves file to
+ * artifacts/demo-results directory. Overwrites existing file if present.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {string} targetFileName - Target filename (e.g., 'organization-setup.webm').
+ * @returns {Promise<string|null>} Path to saved video or null if no video or error.
+ *
+ * @example
+ * const videoPath = await saveRecordedVideo(page, 'organization-setup.webm');
+ * if (videoPath) {
+ *   console.log(`Video saved to: ${videoPath}`);
+ * }
+ */
 async function saveRecordedVideo(page, targetFileName) {
   const video = page.video();
   if (!video) {
@@ -788,6 +1292,24 @@ async function saveRecordedVideo(page, targetFileName) {
   return targetPath;
 }
 
+/**
+ * Registers new user account.
+ *
+ * Navigates to registration page, fills form fields with paced timing,
+ * and verifies successful registration.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {Object} user - User credentials object.
+ * @param {string} user.firstName - User first name.
+ * @param {string} user.lastName - User last name.
+ * @param {string} user.email - User email address.
+ * @param {string} user.password - User password.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * const user = buildUser();
+ * await registerUser(page, user);
+ */
 async function registerUser(page, user) {
   await page.goto('/eden/default/user/register', { waitUntil: 'domcontentloaded' });
   await expect(page.locator('#auth_user_first_name')).toBeVisible();
@@ -804,6 +1326,22 @@ async function registerUser(page, user) {
   await expect(page.getByText('Email verified - you can now login')).toBeVisible();
 }
 
+/**
+ * Logs in user with existing credentials.
+ *
+ * Navigates to login page, fills credentials, submits form, and verifies
+ * successful login by checking for Organizations menu item.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {Object} user - User credentials object.
+ * @param {string} user.email - User email address.
+ * @param {string} user.password - User password.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * const user = loadEnvCredentials();
+ * await loginUser(page, user);
+ */
 async function loginUser(page, user) {
   await page.goto('/eden/default/user/login', { waitUntil: 'domcontentloaded' });
   await page.locator('#auth_user_email').fill(user.email);
@@ -817,6 +1355,15 @@ async function loginUser(page, user) {
   await expect(page.getByRole('menuitem', { name: 'Organizations' })).toBeVisible();
 }
 
+/**
+ * Opens Organizations module from main menu.
+ *
+ * @param {import('playwright').Page} page - The Playwright page object.
+ * @returns {Promise<void>}
+ *
+ * @example
+ * await openOrganizations(page);
+ */
 async function openOrganizations(page) {
   await pacedClick(page.getByRole('menuitem', { name: 'Organizations' }));
   await expect(page).toHaveURL(/\/eden\/org\/index$/);

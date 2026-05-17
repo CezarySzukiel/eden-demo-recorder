@@ -1,6 +1,34 @@
+# Environment variables
 .env
+.env.local
+.env.*.local
+
+# Build artifacts
 artifacts/
+playwright-report/
+test-results/
+
+# Dependencies
 node_modules/
+
+# IDE and editor files
 .codex
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
 saved/
 temp/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

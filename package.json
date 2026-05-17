@@ -1,6 +1,7 @@
 {
   "name": "eden-demo-automation",
   "version": "1.0.0",
+  "description": "Playwright automation for recording demo videos of Sahana Eden humanitarian platform",
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
@@ -9,9 +10,21 @@
     "warehouses_extended": "playwright test -c playwright.demo.config.js warehouses-extended.spec.js",
     "warehouses_overview": "playwright test -c playwright.demo.config.js warehouses-overview.spec.js"
   },
-  "author": "",
+  "keywords": [
+    "playwright",
+    "automation",
+    "demo",
+    "sahana-eden",
+    "humanitarian",
+    "video-recording",
+    "e2e-testing"
+  ],
+  "author": "Eden Demo Team",
   "license": "ISC",
-  "description": "",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
   "devDependencies": {
     "playwright": "^1.59.1"
   }
