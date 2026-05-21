@@ -1,0 +1,243 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - link "Humanitarian Management System Sahana Eden Humanitarian Management System" [ref=e5] [cursor=pointer]:
+        - /url: /eden/default/index
+        - img "Humanitarian Management System" [ref=e7]
+        - generic [ref=e8]:
+          - heading "Sahana Eden" [level=5] [ref=e9]
+          - heading "Humanitarian Management System" [level=6] [ref=e10]
+      - combobox "Language Selection" [ref=e13]:
+        - option "العربية"
+        - option "Bosanski"
+        - option "English" [selected]
+        - option "Français"
+        - option "Deutsch"
+        - option "Español"
+        - option "Italiano"
+        - option "ភាសាខ្មែរ"
+        - option "Монгол хэл"
+        - option "မြန်မာစာ"
+        - option "नेपाली"
+        - option "Polski"
+        - option "دری"
+        - option "پښتو"
+        - option "Português"
+        - option "Svenska"
+        - option "Tiếng Việt"
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - text: email@example.com
+          - generic [ref=e16]: 
+        - list [ref=e17]:
+          - listitem [ref=e18]:
+            - link "Administration" [ref=e19] [cursor=pointer]:
+              - /url: /eden/admin/index
+          - listitem [ref=e20]:
+            - text: "|"
+            - link "Profile" [ref=e21] [cursor=pointer]:
+              - /url: /eden/default/person
+          - listitem [ref=e22]:
+            - text: "|"
+            - link "Change Password" [ref=e23] [cursor=pointer]:
+              - /url: /eden/default/user/change_password
+          - listitem [ref=e24]:
+            - text: "|"
+            - link "Logout" [ref=e25] [cursor=pointer]:
+              - /url: /eden/default/user/logout
+    - navigation [ref=e28]:
+      - generic [ref=e29]:
+        - menubar [ref=e31]:
+          - menuitem "Organizations" [ref=e32] [cursor=pointer]
+          - menuitem "Staff" [ref=e33] [cursor=pointer]
+          - menuitem "Volunteers" [ref=e34] [cursor=pointer]
+          - menuitem "Projects" [ref=e35] [cursor=pointer]
+          - menuitem "Warehouses" [ref=e36] [cursor=pointer]
+          - menuitem "Assets" [ref=e37] [cursor=pointer]
+          - menuitem "Map" [ref=e38] [cursor=pointer]
+          - menuitem "more" [ref=e39] [cursor=pointer]
+        - generic:
+          - menubar
+    - generic [ref=e40]:
+      - navigation [ref=e42]:
+        - list [ref=e43]:
+          - listitem [ref=e44]:
+            - link "Volunteers" [ref=e45] [cursor=pointer]:
+              - /url: /eden/vol/volunteer/summary
+            - list [ref=e46]:
+              - listitem [ref=e47]:
+                - link "Create" [ref=e48] [cursor=pointer]:
+                  - /url: /eden/vol/volunteer/create
+              - listitem [ref=e49]:
+                - link "Search by Skills" [ref=e50] [cursor=pointer]:
+                  - /url: /eden/vol/competency
+              - listitem [ref=e51]:
+                - link "Import" [ref=e52] [cursor=pointer]:
+                  - /url: /eden/vol/person/import?group=volunteer
+          - listitem [ref=e53]:
+            - link "Staff & Volunteers (Combined)" [ref=e54] [cursor=pointer]:
+              - /url: /eden/vol/human_resource/summary
+          - listitem [ref=e55]:
+            - link "Teams" [ref=e56] [cursor=pointer]:
+              - /url: /eden/vol/group
+            - list [ref=e57]:
+              - listitem [ref=e58]:
+                - link "Create" [ref=e59] [cursor=pointer]:
+                  - /url: /eden/vol/group/create
+              - listitem [ref=e60]:
+                - link "Search Members" [ref=e61] [cursor=pointer]:
+                  - /url: /eden/vol/group_membership
+              - listitem [ref=e62]:
+                - link "Import" [ref=e63] [cursor=pointer]:
+                  - /url: /eden/vol/group_membership/import
+          - listitem [ref=e64]:
+            - link "Volunteer Role Catalog" [ref=e65] [cursor=pointer]:
+              - /url: /eden/vol/job_title
+            - list [ref=e66]:
+              - listitem [ref=e67]:
+                - link "Create" [ref=e68] [cursor=pointer]:
+                  - /url: /eden/vol/job_title/create
+          - listitem [ref=e69]:
+            - link "Skill Catalog" [ref=e70] [cursor=pointer]:
+              - /url: /eden/vol/skill
+            - list [ref=e71]:
+              - listitem [ref=e72]:
+                - link "Create" [ref=e73] [cursor=pointer]:
+                  - /url: /eden/vol/skill/create
+          - listitem [ref=e74]:
+            - link "Training Events" [ref=e75] [cursor=pointer]:
+              - /url: /eden/vol/training_event
+            - list [ref=e76]:
+              - listitem [ref=e77]:
+                - link "Create" [ref=e78] [cursor=pointer]:
+                  - /url: /eden/vol/training_event/create
+              - listitem [ref=e79]:
+                - link "Search Training Participants" [ref=e80] [cursor=pointer]:
+                  - /url: /eden/vol/training
+              - listitem [ref=e81]:
+                - link "Import Participant List" [ref=e82] [cursor=pointer]:
+                  - /url: /eden/vol/training/import
+          - listitem [ref=e83]:
+            - link "Training Course Catalog" [ref=e84] [cursor=pointer]:
+              - /url: /eden/vol/course
+            - list [ref=e85]:
+              - listitem [ref=e86]:
+                - link "Create" [ref=e87] [cursor=pointer]:
+                  - /url: /eden/vol/course/create
+          - listitem [ref=e88]:
+            - link "Certificate Catalog" [ref=e89] [cursor=pointer]:
+              - /url: /eden/vol/certificate
+            - list [ref=e90]:
+              - listitem [ref=e91]:
+                - link "Create" [ref=e92] [cursor=pointer]:
+                  - /url: /eden/vol/certificate/create
+          - listitem [ref=e93]:
+            - link "Programs" [ref=e94] [cursor=pointer]:
+              - /url: /eden/vol/programme
+            - list [ref=e95]:
+              - listitem [ref=e96]:
+                - link "Create" [ref=e97] [cursor=pointer]:
+                  - /url: /eden/vol/programme/create
+              - listitem [ref=e98]:
+                - link "Import Hours" [ref=e99] [cursor=pointer]:
+                  - /url: /eden/vol/programme_hours/import
+          - listitem [ref=e100]:
+            - link "Reports" [ref=e101] [cursor=pointer]:
+              - /url: /eden/vol/volunteer/report
+            - list [ref=e102]:
+              - listitem [ref=e103]:
+                - link "Volunteer Report" [ref=e104] [cursor=pointer]:
+                  - /url: /eden/vol/volunteer/report
+              - listitem [ref=e105]:
+                - link "Hours by Role Report" [ref=e106] [cursor=pointer]:
+                  - /url: /eden/vol/programme_hours/report?cols=month&fact=sum%28hours%29&rows=job_title_id
+              - listitem [ref=e107]:
+                - link "Hours by Program Report" [ref=e108] [cursor=pointer]:
+                  - /url: /eden/vol/programme_hours/report?cols=month&fact=sum%28hours%29&rows=programme_id
+              - listitem [ref=e109]:
+                - link "Training Report" [ref=e110] [cursor=pointer]:
+                  - /url: /eden/vol/training/report
+      - generic [ref=e111]:
+        - heading "Volunteers" [level=2] [ref=e112]
+        - generic [ref=e113]:
+          - generic [ref=e115]:
+            - generic:
+              - generic:
+                - generic [ref=e117] [cursor=pointer]: Create Volunteer
+                - text:      
+          - generic [ref=e122]:
+            - generic [ref=e123]:
+              - generic [ref=e125] [cursor=pointer]: "Search:"
+              - textbox "Search:" [active] [ref=e127]
+            - generic [ref=e128]:
+              - generic [ref=e130] [cursor=pointer]: "Organization:"
+              - button "Select" [ref=e132]:
+                - generic "Open" [ref=e133]
+                - text: Select
+            - generic [ref=e137]:
+              - generic [ref=e138] [cursor=pointer]:
+                - text: More Options
+                - generic [ref=e139]: 
+                - text: 
+              - text: Clear FilterSaved Filters
+        - generic [ref=e140]:
+          - tablist [ref=e142]:
+            - tab "Table" [expanded] [selected] [ref=e143]:
+              - link "Table" [ref=e144]:
+                - /url: "#table"
+            - tab "Report" [ref=e145]:
+              - link "Report" [ref=e146] [cursor=pointer]:
+                - /url: "#report"
+            - tab "Map" [ref=e147]:
+              - link "Map" [ref=e148] [cursor=pointer]:
+                - /url: "#map"
+          - tabpanel "Table" [ref=e150]:
+            - generic [ref=e154]:
+              - status [ref=e155]: Showing 0 to 0 of 0 entries
+              - generic [ref=e157] [cursor=pointer]:
+                - text: Show
+                - combobox "Show entries" [ref=e158]:
+                  - option "25" [selected]
+                  - option "50"
+                  - option "All"
+                - text: entries
+              - table [ref=e160]:
+                - rowgroup [ref=e161]:
+                  - 'row "Person: activate to sort column descending Sex: activate to sort column ascending Volunteer Role: activate to sort column ascending Organization: activate to sort column ascending Mobile Phone: activate to sort column ascending" [ref=e162]':
+                    - columnheader [ref=e163]
+                    - 'columnheader "Person: activate to sort column descending" [ref=e164] [cursor=pointer]': ▴ Person ▾
+                    - 'columnheader "Sex: activate to sort column ascending" [ref=e165] [cursor=pointer]': ▴ Sex ▾
+                    - 'columnheader "Volunteer Role: activate to sort column ascending" [ref=e166] [cursor=pointer]': ▴ Volunteer Role ▾
+                    - 'columnheader "Organization: activate to sort column ascending" [ref=e167] [cursor=pointer]': ▴ Organization ▾
+                    - 'columnheader "Mobile Phone: activate to sort column ascending" [ref=e168] [cursor=pointer]': ▴ Mobile Phone ▾
+                    - text: ▴ ▾ ▴ ▾ ▴ ▾ ▴ ▾ ▴ ▾
+                - rowgroup [ref=e169]:
+                  - row "No records found" [ref=e170]:
+                    - cell "No records found" [ref=e171] [cursor=pointer]
+              - generic [ref=e172]: Showing 0 to 0 of 0 entries
+  - contentinfo [ref=e173]:
+    - generic [ref=e175]:
+      - generic [ref=e176]:
+        - list [ref=e178]:
+          - listitem [ref=e179]:
+            - link "Help" [ref=e180] [cursor=pointer]:
+              - /url: /eden/default/help
+          - listitem [ref=e181]:
+            - text: "|"
+            - link "Contact" [ref=e182] [cursor=pointer]:
+              - /url: /eden/default/contact
+          - listitem [ref=e183]:
+            - text: "|"
+            - link "Version" [ref=e184] [cursor=pointer]:
+              - /url: /eden/default/about
+        - paragraph [ref=e186]:
+          - link "Powered by Sahana Powered by Sahana" [ref=e187] [cursor=pointer]:
+            - /url: https://eden-asp.readthedocs.io
+            - img "Powered by Sahana" [ref=e188]
+            - text: Powered by Sahana
+      - generic [ref=e191]:
+        - button "request" [ref=e192] [cursor=pointer]
+        - button "session" [ref=e193] [cursor=pointer]
+        - button "db tables" [ref=e194] [cursor=pointer]
+        - button "db stats" [ref=e195] [cursor=pointer]
+  - status [ref=e196]

@@ -1,0 +1,90 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - link "Humanitarian Management System Sahana Eden Humanitarian Management System" [ref=e5] [cursor=pointer]:
+        - /url: /eden/default/index
+        - img "Humanitarian Management System" [ref=e7]
+        - generic [ref=e8]:
+          - heading "Sahana Eden" [level=5] [ref=e9]
+          - heading "Humanitarian Management System" [level=6] [ref=e10]
+      - combobox "Language Selection" [ref=e13]:
+        - option "العربية"
+        - option "Bosanski"
+        - option "English" [selected]
+        - option "Français"
+        - option "Deutsch"
+        - option "Español"
+        - option "Italiano"
+        - option "ភាសាខ្មែរ"
+        - option "Монгол хэл"
+        - option "မြန်မာစာ"
+        - option "नेपाली"
+        - option "Polski"
+        - option "دری"
+        - option "پښتو"
+        - option "Português"
+        - option "Svenska"
+        - option "Tiếng Việt"
+      - generic [ref=e14]:
+        - generic [ref=e15]:
+          - text: anonymous user
+          - generic [ref=e16]: 
+        - list [ref=e17]:
+          - listitem [ref=e18]:
+            - link "Register" [ref=e19] [cursor=pointer]:
+              - /url: /eden/default/user/register
+          - listitem [ref=e20]:
+            - text: "|"
+            - link "Login" [ref=e21] [cursor=pointer]:
+              - /url: /eden/default/user/login?_next=%2Feden%2Fvol%2Findex
+          - listitem [ref=e22]:
+            - text: "|"
+            - link "Lost Password" [ref=e23] [cursor=pointer]:
+              - /url: /eden/default/user/retrieve_password
+    - navigation [ref=e26]:
+      - generic [ref=e27]:
+        - generic:
+          - menubar
+        - generic:
+          - menubar
+    - generic [ref=e29]:
+      - generic [ref=e32] [cursor=pointer]: Authentication Required
+      - generic [ref=e33]:
+        - heading "Login" [level=2] [ref=e34]
+        - generic [ref=e36]:
+          - generic [ref=e38]:
+            - generic [ref=e39] [cursor=pointer]: "Email:"
+            - textbox "Email:" [ref=e41]
+          - generic [ref=e43]:
+            - generic [ref=e44] [cursor=pointer]: "Password:"
+            - textbox "Password:" [ref=e46]
+          - generic [ref=e50]:
+            - checkbox "Remember Me" [ref=e51]
+            - generic [ref=e52] [cursor=pointer]: Remember Me
+          - generic [ref=e56]:
+            - button "Login" [ref=e57] [cursor=pointer]
+            - link "Register for Account" [ref=e58] [cursor=pointer]:
+              - /url: /eden/default/user/register
+            - link "Lost Password" [ref=e59] [cursor=pointer]:
+              - /url: /eden/default/user/retrieve_password
+  - contentinfo [ref=e60]:
+    - generic [ref=e62]:
+      - generic [ref=e63]:
+        - list [ref=e65]:
+          - listitem [ref=e66]:
+            - link "Help" [ref=e67] [cursor=pointer]:
+              - /url: /eden/default/help
+          - listitem [ref=e68]:
+            - text: "|"
+            - link "Contact" [ref=e69] [cursor=pointer]:
+              - /url: /eden/default/contact
+        - paragraph [ref=e71]:
+          - link "Powered by Sahana Powered by Sahana" [ref=e72] [cursor=pointer]:
+            - /url: https://eden-asp.readthedocs.io
+            - img "Powered by Sahana" [ref=e73]
+            - text: Powered by Sahana
+      - generic [ref=e76]:
+        - button "request" [ref=e77] [cursor=pointer]
+        - button "session" [ref=e78] [cursor=pointer]
+        - button "db tables" [ref=e79] [cursor=pointer]
+        - button "db stats" [ref=e80] [cursor=pointer]

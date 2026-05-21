@@ -1131,10 +1131,40 @@ function shouldSkipUnavailableSelect(step) {
   return step.fallbackSelect === 'skip' || step.fallbackSelect === 'firstAvailableOrSkip';
 }
 
+async function dismissVisibleAutocomplete(page) {
+  const autocomplete = page.locator('ul.ui-autocomplete:visible').first();
+  if (!await autocomplete.isVisible({ timeout: 500 }).catch(() => false)) {
+    return;
+  }
+
+  const noneOfTheAbove = autocomplete
+    .locator('.ui-menu-item-wrapper')
+    .filter({ hasText: /^None of the above$/i })
+    .first();
+
+  if (await noneOfTheAbove.isVisible({ timeout: 500 }).catch(() => false)) {
+    await noneOfTheAbove.click({ force: true });
+  } else {
+    await page.keyboard.press('Escape');
+  }
+
+  if (await autocomplete.isVisible({ timeout: 500 }).catch(() => false)) {
+    await page.keyboard.press('Escape');
+  }
+  if (await autocomplete.isVisible({ timeout: 1000 }).catch(() => false)) {
+    await autocomplete.evaluate((element) => {
+      element.style.display = 'none';
+    }).catch(() => {});
+  }
+  await autocomplete.waitFor({ state: 'hidden', timeout: 3000 }).catch(() => {});
+  await page.waitForTimeout(300);
+}
+
 async function runFieldStep(locator, step) {
   const delay = step.captionDelay ?? DEFAULT_CAPTION_DELAY_MS;
   const page = locator.page();
   await locator.waitFor({ state: 'visible', timeout: step.waitTimeout ?? FIELD_WAIT_TIMEOUT_MS });
+  await dismissVisibleAutocomplete(page);
   await moveDemoCursor(locator);
   const caption = await showCaption(page, step.description, delay);
 
@@ -1144,13 +1174,28 @@ async function runFieldStep(locator, step) {
   }
 
   await triggerDemoCursorClick(locator.page());
+  await dismissVisibleAutocomplete(page);
   await locator.page().waitForTimeout(POST_CURSOR_CLICK_DELAY_MS);
+  await dismissVisibleAutocomplete(page);
 
   if (step.action === 'fill') {
     await locator.click();
     await locator.press('ControlOrMeta+A');
     await locator.press('Backspace');
     await locator.page().keyboard.type(step.value, { delay: TYPE_DELAY_MS });
+
+    if (step.closeAutocomplete) {
+      await page.waitForTimeout(1500);
+      await dismissVisibleAutocomplete(page);
+    }
+
+    // Close calendar widget if this is a date field
+    const fieldId = await locator.getAttribute('id').catch(() => null);
+    if (fieldId && (fieldId.includes('date') || fieldId.includes('_date_'))) {
+      await locator.press('Escape');
+      await locator.page().waitForTimeout(300);
+    }
+
     await locator.page().waitForTimeout(ACTION_DELAY_MS);
     await holdCaption(page, caption);
     return;
@@ -1164,7 +1209,10 @@ async function runFieldStep(locator, step) {
   }
 
   if (step.action === 'select') {
+    // Click to open the dropdown (important for visual recording)
     await locator.click();
+    await locator.page().waitForTimeout(300); // Wait for dropdown to open
+
     if (step.match === 'contains') {
       try {
         await selectOptionContainingText(locator, step.value);
@@ -1220,8 +1268,13 @@ async function runFieldStep(locator, step) {
   throw new Error(`Unsupported field action: ${step.action}`);
 }
 
-async function describeAndFill(locator, description, value) {
-  await runFieldStep(locator, { action: 'fill', description, value });
+async function describeAndFill(locator, description, value, options = {}) {
+  await runFieldStep(locator, {
+    action: 'fill',
+    description,
+    value,
+    closeAutocomplete: options.closeAutocomplete,
+  });
 }
 
 async function describeAndSelect(locator, description, value, match = 'exact', fallbackSelect) {

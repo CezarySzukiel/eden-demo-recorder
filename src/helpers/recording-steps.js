@@ -56,6 +56,7 @@ async function showPageStep(page, step, defaults = {}) {
  * @param {string} [fields[].match] - Match mode for select: 'exact' or 'contains'.
  * @param {string} [fields[].fallbackSelect] - Fallback behavior for select.
  * @param {boolean} [fields[].ifVisible] - Only describe if field is visible.
+ * @param {boolean} [fields[].closeAutocomplete] - Pick/dismiss autocomplete suggestions after filling.
  * @param {number} [fields[].delay] - Caption delay for this field.
  * @param {Object} [defaults={}] - Default values.
  * @param {number} [defaults.delay] - Default caption delay.
@@ -77,6 +78,7 @@ async function describeFormFields(page, fields, defaults = {}) {
       match: field.match,
       fallbackSelect: field.fallbackSelect,
       ifVisible: field.ifVisible,
+      closeAutocomplete: field.closeAutocomplete,
       delay: field.delay ?? defaults.delay,
     });
   }
@@ -87,15 +89,18 @@ async function describeFormFields(page, fields, defaults = {}) {
  *
  * This function handles the common pattern of:
  * 1. Navigate to section page (e.g., /eden/org/organisation)
- * 2. Navigate to create form (e.g., /eden/org/organisation/create)
- * 3. Wait for first field to be visible
- * 4. Describe all form fields
+ * 2. Optionally show intro caption on section page
+ * 3. Navigate to create form (e.g., /eden/org/organisation/create)
+ * 4. Wait for first field to be visible
+ * 5. Describe all form fields
  *
  * @param {import('playwright').Page} page - The Playwright page object.
  * @param {Object} step - Create form step configuration.
  * @param {string} step.sectionHref - Href to section list page.
  * @param {string} step.sectionDescription - Caption for section page.
  * @param {number} [step.sectionDelay] - Caption delay for section page.
+ * @param {string} [step.sectionIntro] - Optional intro caption to show after section navigation.
+ * @param {number} [step.sectionIntroDelay] - Caption delay for section intro.
  * @param {string} step.createHref - Href to create form page.
  * @param {string} step.createDescription - Caption for create form.
  * @param {number} [step.createDelay] - Caption delay for create form.
@@ -109,6 +114,7 @@ async function describeFormFields(page, fields, defaults = {}) {
  * await showCreateFormStep(page, {
  *   sectionHref: '/eden/org/organisation',
  *   sectionDescription: 'Organizations section',
+ *   sectionIntro: 'Now we will create a new organization',
  *   createHref: '/eden/org/organisation/create',
  *   createDescription: 'Create new organization',
  *   firstFieldSelector: '#org_organisation_name',
@@ -123,12 +129,27 @@ async function showCreateFormStep(page, step, defaults = {}) {
     description: step.sectionDescription,
     delay: step.sectionDelay,
   }, defaults);
-  await showPageStep(page, {
-    href: step.createHref,
-    description: step.createDescription,
-    delay: step.createDelay,
-  }, defaults);
+
+  // Show optional intro caption on section page (from step.section.sectionIntro or step.sectionIntro)
+  const introText = step.section?.sectionIntro || step.sectionIntro;
+  if (introText) {
+    const { showStandaloneCaption } = require('./eden-demo');
+    await showStandaloneCaption(page, introText, step.sectionIntroDelay ?? 3000);
+  }
+
+  // Navigate to create form WITHOUT showing caption yet
+  await navigateViaHref(page, step.createHref, '', {
+    delay: 0,
+  });
+
+  // Wait for form to be visible
   await expect(page.locator(step.firstFieldSelector)).toBeVisible();
+
+  // NOW show the create description on the actual form page
+  const { showStandaloneCaption } = require('./eden-demo');
+  await showStandaloneCaption(page, step.createDescription, step.createDelay ?? defaults.delay);
+
+  // Describe form fields
   await describeFormFields(page, step.fields, defaults);
 }
 

@@ -1,0 +1,150 @@
+{
+  "intro_caption": "Moduł Volunteers w Sahana Eden służy do kompleksowego zarządzania wolontariuszami - od rejestracji, przez przypisywanie umiejętności i szkoleń, aż po mobilizację w sytuacjach kryzysowych.",
+  
+  "config_intro": "Zacznijmy od skonfigurowania katalogów bazowych, które będą wykorzystywane przy rejestracji wolontariuszy.",
+  
+  "section_skills": "Katalog umiejętności - tutaj definiujemy wszystkie kompetencje, które mogą posiadać wolontariusze.",
+  "create_skill": "Tworzymy nową umiejętność, która będzie dostępna przy rejestracji wolontariuszy.",
+  "skill_name": "Nazwa umiejętności",
+  "skill_type": "Komentarz",
+  "skill_created": "Umiejętność została utworzona i jest dostępna w katalogu.",
+  
+  "section_roles": "Katalog ról wolontariackich - definiujemy stanowiska i funkcje, które mogą pełnić wolontariusze.",
+  "create_role": "Tworzymy nową rolę wolontariacką.",
+  "role_name": "Nazwa roli",
+  "role_type": "Typ roli i opis wymagań",
+  "role_created": "Rola została utworzona i jest dostępna w systemie.",
+  
+  "section_certificates": "Katalog certyfikatów - rejestrujemy wszystkie rodzaje certyfikatów i uprawnień.",
+  "create_certificate": "Tworzymy nowy typ certyfikatu.",
+  "certificate_name": "Nazwa certyfikatu.",
+  "certificate_organization": "Organizacja wydająca certyfikat",
+  "certificate_expiry": "Okres ważności certyfikatu w miesiącach",
+  "certificate_created": "Certyfikat został dodany do katalogu.",
+  
+  "section_courses": "Katalog kursów szkoleniowych - definiujemy wszystkie dostępne szkolenia.",
+  "create_course": "Tworzymy nowy kurs szkoleniowy.",
+  "course_code": "Kod kursu",
+  "course_name": "Pełna nazwa szkolenia",
+  "course_organization": "Organizacja odpowiedzialna za szkolenie",
+  "course_hours": "Liczba godzin szkolenia",
+  "course_url": "Adres URL do materiałów szkoleniowych",
+  "course_comments": "Dodatkowe informacje o kursie",
+  "course_created": "Kurs został dodany do katalogu szkoleń.",
+  
+  "volunteer_intro": "Teraz możemy zarejestrować nowego wolontariusza, wykorzystując utworzone wcześniej katalogi.",
+  "section_volunteers": "Lista wolontariuszy.",
+  "create_volunteer": "Rejestrujemy nowego wolontariusza - wypełnimy pełny formularz z danymi osobowymi, kontaktowymi i kompetencjami.",
+  
+  "volunteer_first_name": "Imię wolontariusza",
+  "volunteer_middle_name": "Drugie imię (opcjonalne)",
+  "volunteer_last_name": "Nazwisko wolontariusza",
+  "volunteer_date_of_birth": "Data urodzenia",
+  "volunteer_gender": "Płeć",
+  
+  "volunteer_email": "Adres email",
+  "volunteer_phone": "Numer telefonu",
+  "volunteer_address": "Adres zamieszkania",
+  "volunteer_city": "Miasto",
+  "volunteer_postcode": "Kod pocztowy",
+  
+  "volunteer_organization": "Organizacja, do której należy wolontariusz",
+  "volunteer_type": "Zawód",
+  "volunteer_cluster_type": "Typ grupy wolontariuszy określa rodzaj/kategorię grupy, do której może należeć wolontariusz. Pole służy głównie do uporządkowania i filtrowania listy grup wolontariuszy",
+  
+  "volunteer_program": "Program wolontariatu - wybieramy program, w którym będzie uczestniczył wolontariusz",
+  "volunteer_role": "Rola wolontariusza - wybieramy stanowisko z wcześniej utworzonego katalogu ról",
+  "volunteer_skill_level": "Poziom zaawansowania w danej umiejętności",
+  "volunteer_start_date": "Data rozpoczęcia dostępności wolontariusza",
+  "volunteer_end_date": "Data zakończenia dostępności wolontariusza",
+  
+  "volunteer_comments": "Dodatkowe uwagi o wolontariuszu",
+  "volunteer_save": "Zapisujemy dane wolontariusza",
+  "volunteer_created": "Wolontariusz został zarejestrowany w systemie i jest widoczny na liście.",
+  
+  "team_intro": "Wolontariusze mogą być organizowani w zespoły dla lepszej koordynacji działań.",
+  "section_teams": "Lista zespołów - grupy wolontariuszy przypisane do konkretnych zadań lub obszarów.",
+  "create_team": "Tworzymy nowy zespół wolontariuszy.",
+  "team_name": "Nazwa zespołu",
+  "team_description": "Opis zespołu i jego zadań",
+  "team_organization": "Organizacja zarządzająca zespołem",
+  "team_comments": "Dodatkowe uwagi o zespole",
+  "team_members": "Członkowie zespołu - przypisujemy wolontariuszy",
+  "team_created": "Zespół został utworzony i jest gotowy do działania.",
+  
+  "training_intro": "System umożliwia organizację szkoleń i śledzenie uczestnictwa wolontariuszy.",
+  "section_training_events": "Wydarzenia szkoleniowe - lista zaplanowanych i przeprowadzonych szkoleń.",
+  "create_training_event": "Organizujemy nowe wydarzenie szkoleniowe.",
+  "training_name": "Nazwa wydarzenia szkoleniowego",
+  "training_course": "Kurs - wybieramy z katalogu szkoleń",
+  "training_organized_by": "Organizator wydarzenia",
+  "training_date": "Data rozpoczęcia szkolenia",
+  "training_end_date": "Data zakończenia szkolenia",
+  "training_duration": "Czas trwania szkolenia",
+  "training_location": "Miejsce przeprowadzenia szkolenia",
+  "training_instructor": "Instruktor prowadzący szkolenie",
+  "training_comments": "Uwagi do szkolenia",
+  "training_participants": "Uczestnicy - przypisujemy wolontariuszy do szkolenia",
+  "training_created": "Wydarzenie szkoleniowe zostało utworzone.",
+  
+  "program_intro": "Programy wolontariackie pozwalają na organizację długoterminowych działań i śledzenie czasu pracy.",
+  "section_programs": "Lista programów wolontariackich - długoterminowe inicjatywy i projekty.",
+  "create_program": "Tworzymy nowy program wolontariatu.",
+  "program_name": "Nazwa programu",
+  "program_description": "Opis programu i jego celów",
+  "program_start_date": "Data rozpoczęcia programu",
+  "program_end_date": "Data zakończenia programu",
+  "program_organization": "Organizacja realizująca program",
+  "program_comments": "Uwagi do programu",
+  
+  "program_created": "Program został utworzony i można rejestrować godziny pracy wolontariuszy.",
+  
+  "program_hours_intro": "Rejestrujemy godziny pracy wolontariuszy w ramach programu.",
+  "program_hours_volunteer": "Wolontariusz wykonujący pracę",
+  "program_hours_date": "Data wykonania pracy",
+  "program_hours_hours": "Liczba przepracowanych godzin",
+  "program_hours_role": "Rola pełniona podczas pracy",
+  "program_hours_saved": "Godziny pracy zostały zarejestrowane.",
+  
+  "search_intro": "System oferuje zaawansowane wyszukiwanie wolontariuszy według różnych kryteriów.",
+  "search_by_skills": "Wyszukiwanie według umiejętności - znajdujemy wolontariuszy z konkretnymi kompetencjami.",
+  "search_skill_select": "Wybieramy umiejętność, której szukamy",
+  "search_skill_level": "Minimalny poziom zaawansowania",
+  "search_execute": "Uruchamiamy wyszukiwanie",
+  "search_results": "Wyniki wyszukiwania - wolontariusze spełniający kryteria.",
+  
+  "filter_intro": "Na liście wolontariuszy możemy stosować różne filtry.",
+  "filter_by_status": "Filtrowanie według statusu - np. tylko aktywni wolontariusze",
+  "filter_by_location": "Filtrowanie według lokalizacji - wolontariusze z konkretnego obszaru",
+  "filter_by_organization": "Filtrowanie według organizacji",
+  "filter_by_availability": "Filtrowanie według dostępności czasowej",
+  "filter_results": "Przefiltrowana lista wolontariuszy gotowych do mobilizacji.",
+  
+  "reports_intro": "Moduł oferuje kompleksowe raporty do analizy działań wolontariackich.",
+  "section_reports": "Raporty - różne zestawienia i analizy danych o wolontariuszach.",
+  
+  "report_volunteer": "Raport wolontariuszy - szczegółowe zestawienie wszystkich zarejestrowanych osób.",
+  "report_volunteer_desc": "Zawiera dane osobowe, umiejętności, dostępność i historię działań każdego wolontariusza.",
+  
+  "report_hours_by_role": "Raport godzin według ról - analiza czasu pracy w podziale na stanowiska.",
+  "report_hours_by_role_desc": "Pokazuje ile godzin przepracowano w każdej roli, przydatne do planowania zasobów.",
+  
+  "report_hours_by_program": "Raport godzin według programów - analiza czasu pracy w podziale na programy.",
+  "report_hours_by_program_desc": "Pokazuje zaangażowanie wolontariuszy w poszczególne programy i projekty.",
+  
+  "report_training": "Raport szkoleń - zestawienie wszystkich przeprowadzonych szkoleń i uczestników.",
+  "report_training_desc": "Zawiera informacje o kursach, datach, uczestnikach i wydanych certyfikatach.",
+  
+  "report_export": "Raporty można eksportować do plików CSV lub PDF dla dalszej analizy.",
+  
+  "scenario_mobilization": "Praktyczny scenariusz: szybka mobilizacja wolontariuszy w sytuacji kryzysowej.",
+  "mobilization_step1": "Otrzymujemy zgłoszenie o nagłym zdarzeniu wymagającym pomocy.",
+  "mobilization_step2": "Wyszukujemy wolontariuszy z odpowiednimi umiejętnościami i dostępnością.",
+  "mobilization_step3": "Filtrujemy według lokalizacji, aby znaleźć osoby najbliżej miejsca zdarzenia.",
+  "mobilization_step4": "System pokazuje listę wolontariuszy gotowych do natychmiastowego działania.",
+  "mobilization_step5": "Możemy wysłać powiadomienia do wybranych osób przez moduł Messaging.",
+  
+  "summary": "Moduł Volunteers zapewnia kompleksowe narzędzie do zarządzania wolontariuszami - od rejestracji, przez szkolenia i programy, aż po szybką mobilizację w sytuacjach kryzysowych.",
+  "summary_features": "Kluczowe funkcje: katalogi konfiguracyjne, pełna rejestracja wolontariuszy, zespoły, szkolenia, programy, zaawansowane wyszukiwanie i szczegółowe raporty.",
+  "summary_integration": "Moduł integruje się z innymi częściami systemu Eden: Organizations, Scenarios & Events, Messaging - tworząc spójny ekosystem zarządzania kryzysowego."
+}

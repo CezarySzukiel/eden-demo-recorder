@@ -66,6 +66,7 @@ async function openCreateForm(page, section) {
  * @param {string} [step.match] - Match mode for select: 'exact' or 'contains'.
  * @param {string} [step.fallbackSelect] - Fallback behavior: 'firstAvailable', 'skip', etc.
  * @param {boolean} [step.ifVisible] - Only describe if field is visible (for describe action).
+ * @param {boolean} [step.closeAutocomplete] - Pick/dismiss autocomplete suggestions after filling.
  * @param {number} [step.delay] - Caption display duration.
  * @returns {Promise<void>}
  * @throws {Error} If action type is not supported.
@@ -91,7 +92,9 @@ async function runDescribedField(page, step) {
   }
 
   if (step.action === 'fill') {
-    await describeAndFill(locator, step.description, step.value);
+    await describeAndFill(locator, step.description, step.value, {
+      closeAutocomplete: step.closeAutocomplete,
+    });
     return;
   }
 

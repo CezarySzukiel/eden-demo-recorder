@@ -8,7 +8,8 @@
     "organizations": "playwright test -c playwright.demo.config.js organization-setup.spec.js",
     "warehouses": "playwright test -c playwright.demo.config.js warehouses-guide.spec.js",
     "warehouses_extended": "playwright test -c playwright.demo.config.js warehouses-extended.spec.js",
-    "warehouses_overview": "playwright test -c playwright.demo.config.js warehouses-overview.spec.js"
+    "warehouses_overview": "playwright test -c playwright.demo.config.js warehouses-overview.spec.js",
+    "volunteers": "playwright test -c playwright.demo.config.js volunteers-guide.spec.js"
   },
   "keywords": [
     "playwright",
