@@ -1,0 +1,150 @@
+{
+  "intro_caption": "The Volunteers module in Sahana Eden supports end-to-end volunteer management - from registration, through skills and training, to mobilization during emergencies.",
+
+  "config_intro": "We start by configuring the base catalogs that will be used when registering volunteers.",
+
+  "section_skills": "Skills catalog - this is where we define the competencies volunteers can have.",
+  "create_skill": "We create a new skill that will be available during volunteer registration.",
+  "skill_name": "Skill name",
+  "skill_type": "Comment",
+  "skill_created": "The skill has been created and is available in the catalog.",
+
+  "section_roles": "Volunteer roles catalog - we define the positions and functions volunteers can perform.",
+  "create_role": "We create a new volunteer role.",
+  "role_name": "Role name",
+  "role_type": "Role type and requirement description",
+  "role_created": "The role has been created and is available in the system.",
+
+  "section_certificates": "Certificates catalog - we register all certificate and qualification types.",
+  "create_certificate": "We create a new certificate type.",
+  "certificate_name": "Certificate name.",
+  "certificate_organization": "Organization issuing the certificate",
+  "certificate_expiry": "Certificate validity period in months",
+  "certificate_created": "The certificate has been added to the catalog.",
+
+  "section_courses": "Training courses catalog - we define all available trainings.",
+  "create_course": "We create a new training course.",
+  "course_code": "Course code",
+  "course_name": "Full training name",
+  "course_organization": "Organization responsible for the training",
+  "course_hours": "Number of training hours",
+  "course_url": "URL for training materials",
+  "course_comments": "Additional course information",
+  "course_created": "The course has been added to the training catalog.",
+
+  "volunteer_intro": "Now we can register a new volunteer using the catalogs we created earlier.",
+  "section_volunteers": "Volunteer list.",
+  "create_volunteer": "We register a new volunteer - filling in a full form with personal, contact, and competency details.",
+
+  "volunteer_first_name": "Volunteer first name",
+  "volunteer_middle_name": "Middle name (optional)",
+  "volunteer_last_name": "Volunteer last name",
+  "volunteer_date_of_birth": "Date of birth",
+  "volunteer_gender": "Gender",
+
+  "volunteer_email": "Email address",
+  "volunteer_phone": "Phone number",
+  "volunteer_address": "Home address",
+  "volunteer_city": "City",
+  "volunteer_postcode": "Postcode",
+
+  "volunteer_organization": "Organization the volunteer belongs to",
+  "volunteer_type": "Occupation",
+  "volunteer_cluster_type": "Volunteer group type defines the kind or category of group the volunteer may belong to. This field mainly helps organize and filter volunteer group lists",
+
+  "volunteer_program": "Volunteer program - we choose the program the volunteer will participate in",
+  "volunteer_role": "Volunteer role - we choose a position from the role catalog created earlier",
+  "volunteer_skill_level": "Skill proficiency level",
+  "volunteer_start_date": "Volunteer availability start date",
+  "volunteer_end_date": "Volunteer availability end date",
+
+  "volunteer_comments": "Additional notes about the volunteer",
+  "volunteer_save": "We save the volunteer details",
+  "volunteer_created": "The volunteer has been registered in the system and is visible in the list.",
+
+  "team_intro": "Volunteers can be organized into teams for better coordination of activities.",
+  "section_teams": "Team list - volunteer groups assigned to specific tasks or areas.",
+  "create_team": "We create a new volunteer team.",
+  "team_name": "Team name",
+  "team_description": "Team description and responsibilities",
+  "team_organization": "Organization managing the team",
+  "team_comments": "Additional team notes",
+  "team_members": "Team members - we assign volunteers",
+  "team_created": "The team has been created and is ready for action.",
+
+  "training_intro": "The system supports organizing trainings and tracking volunteer participation.",
+  "section_training_events": "Training events - list of planned and completed trainings.",
+  "create_training_event": "We organize a new training event.",
+  "training_name": "Training event name",
+  "training_course": "Course - we choose from the training catalog",
+  "training_organized_by": "Event organizer",
+  "training_date": "Training start date",
+  "training_end_date": "Training end date",
+  "training_duration": "Training duration",
+  "training_location": "Training location",
+  "training_instructor": "Training instructor",
+  "training_comments": "Training notes",
+  "training_participants": "Participants - we assign volunteers to the training",
+  "training_created": "The training event has been created.",
+
+  "program_intro": "Volunteer programs support long-term activities and tracking work time.",
+  "section_programs": "Volunteer program list - long-term initiatives and projects.",
+  "create_program": "We create a new volunteer program.",
+  "program_name": "Program name",
+  "program_description": "Program description and objectives",
+  "program_start_date": "Program start date",
+  "program_end_date": "Program end date",
+  "program_organization": "Organization running the program",
+  "program_comments": "Program notes",
+
+  "program_created": "The program has been created and volunteer hours can be recorded.",
+
+  "program_hours_intro": "We record volunteer work hours within the program.",
+  "program_hours_volunteer": "Volunteer performing the work",
+  "program_hours_date": "Work date",
+  "program_hours_hours": "Number of hours worked",
+  "program_hours_role": "Role performed during the work",
+  "program_hours_saved": "Work hours have been recorded.",
+
+  "search_intro": "The system offers advanced volunteer search by different criteria.",
+  "search_by_skills": "Search by skills - we find volunteers with specific competencies.",
+  "search_skill_select": "We choose the skill we are looking for",
+  "search_skill_level": "Minimum proficiency level",
+  "search_execute": "We run the search",
+  "search_results": "Search results - volunteers who match the criteria.",
+
+  "filter_intro": "Different filters can be applied on the volunteer list.",
+  "filter_by_status": "Filter by status - for example, only active volunteers",
+  "filter_by_location": "Filter by location - volunteers from a specific area",
+  "filter_by_organization": "Filter by organization",
+  "filter_by_availability": "Filter by time availability",
+  "filter_results": "Filtered list of volunteers ready for mobilization.",
+
+  "reports_intro": "The module offers comprehensive reports for analyzing volunteer activities.",
+  "section_reports": "Reports - different summaries and analyses of volunteer data.",
+
+  "report_volunteer": "Volunteer report - detailed summary of all registered people.",
+  "report_volunteer_desc": "Includes personal data, skills, availability, and activity history for each volunteer.",
+
+  "report_hours_by_role": "Hours by role report - analysis of work time by position.",
+  "report_hours_by_role_desc": "Shows how many hours were worked in each role, useful for resource planning.",
+
+  "report_hours_by_program": "Hours by program report - analysis of work time by program.",
+  "report_hours_by_program_desc": "Shows volunteer engagement across programs and projects.",
+
+  "report_training": "Training report - summary of all completed trainings and participants.",
+  "report_training_desc": "Includes information about courses, dates, participants, and issued certificates.",
+
+  "report_export": "Reports can be exported to CSV or PDF files for further analysis.",
+
+  "scenario_mobilization": "Practical scenario: rapid volunteer mobilization during an emergency.",
+  "mobilization_step1": "We receive a report of an urgent incident requiring assistance.",
+  "mobilization_step2": "We search for volunteers with the right skills and availability.",
+  "mobilization_step3": "We filter by location to find people closest to the incident.",
+  "mobilization_step4": "The system shows a list of volunteers ready for immediate action.",
+  "mobilization_step5": "We can send notifications to selected people through the Messaging module.",
+
+  "summary": "The Volunteers module provides a comprehensive tool for managing volunteers - from registration, through trainings and programs, to rapid mobilization during emergencies.",
+  "summary_features": "Key features: configuration catalogs, full volunteer registration, teams, trainings, programs, advanced search, and detailed reports.",
+  "summary_integration": "The module integrates with other parts of Eden: Organizations, Scenarios & Events, and Messaging - creating a coherent emergency management ecosystem."
+}

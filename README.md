@@ -32,6 +32,7 @@ which may be cleaned at the start of a test run.
 - `EMAIL` and `PASSWORD` - credentials for existing-user recording flows.
 - `EDEN_RECORDING_WIDTH` - recording width, defaulting to `1600`.
 - `EDEN_RECORDING_HEIGHT` - recording height, defaulting to `900`.
+- `EDEN_RECORDING_LANGUAGE` - recording captions and fixture values language, for example `en` or `pl`; locale files are loaded as `{language}_captions.json` and `{language}_values.json`.
 - `EDEN_ACTION_DELAY_MS` - delay after an action before continuing.
 - `EDEN_TYPE_DELAY_MS` - delay per typed character.
 - `EDEN_CURSOR_MOVE_STEPS` - number of cursor animation steps.

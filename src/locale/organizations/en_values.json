@@ -1,0 +1,45 @@
+{
+  "organizationName": "Demo NGO Aid Network {suffix}",
+  "organizationAcronym": "DNA-{runId}",
+  "organizationCountry": {
+    "label": "Poland"
+  },
+  "organizationPhone": "+48 22 100 20 30",
+  "organizationWebsite": "https://demo-ngo.example.org",
+  "organizationYear": "2015",
+  "organizationComments": "An organization supporting local aid activities.",
+
+  "officeName": "Warsaw Office {suffix}",
+  "officeCode": "WO-{runId}",
+  "officeType": {
+    "label": "Headquarters"
+  },
+  "officeCountry": {
+    "label": "Poland"
+  },
+  "officeAddress": "1 Central Avenue",
+  "officePostcode": "00-001",
+  "officePhone1": "+48 22 111 22 33",
+  "officePhone2": "+48 22 111 22 44",
+  "officeEmail": "warsaw.office@example.org",
+  "officeFax": "+48 22 111 22 55",
+  "officeComments": "Main office coordinating activities in Warsaw.",
+
+  "facilityName": "Distribution Point {suffix}",
+  "facilityCode": "DP-{runId}",
+  "facilityCountry": {
+    "label": "Poland"
+  },
+  "facilityAddress": "10 Logistics Street",
+  "facilityPostcode": "00-950",
+  "facilityOpeningTimes": "Mon-Fri 08:00-18:00",
+  "facilityContact": "Emily Carter",
+  "facilityPhone1": "+48 22 222 33 44",
+  "facilityPhone2": "+48 22 222 33 55",
+  "facilityEmail": "distribution.point@example.org",
+  "facilityWebsite": "https://distribution-point.example.org",
+  "facilityComments": "A facility supporting the distribution of in-kind aid.",
+
+  "resourceTypeName": "Blankets {suffix}",
+  "resourceQuantity": "500"
+}

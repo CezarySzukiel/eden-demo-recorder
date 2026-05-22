@@ -133,10 +133,11 @@ Stworzenie kompleksowego przewodnika wideo po module Volunteers w Sahana Eden, p
 ## Kluczowe elementy techniczne
 
 ### Pliki do utworzenia:
-1. **`src/locale/volunteers/pl.json`** - wszystkie teksty narracji po polsku
-2. **`src/recordings/volunteers-guide.story.js`** - definicje kroków i pól formularzy
-3. **`src/recordings/volunteers-guide.spec.js`** - główny skrypt nagrania
-4. **`package.json`** - dodanie skryptu `npm run volunteers`
+1. **`src/locale/volunteers/pl_captions.json`** - teksty narracji po polsku
+2. **`src/locale/volunteers/pl_values.json`** - dane formularzy po polsku
+3. **`src/recordings/volunteers-guide.story.js`** - definicje kroków i pól formularzy
+4. **`src/recordings/volunteers-guide.spec.js`** - główny skrypt nagrania
+5. **`package.json`** - dodanie skryptu `npm run volunteers`
 
 ### Wzorce do wykorzystania:
 - Użycie `showPageStep()` dla nawigacji między sekcjami

@@ -94,7 +94,8 @@ eden-demo-automation/
 ├── src/
 │   ├── locale/
 │   │   └── volunteers/
-│   │       └── pl.json                    # Teksty narracji PL
+│   │       ├── pl_captions.json           # Teksty narracji PL
+│   │       └── pl_values.json             # Dane formularzy PL
 │   ├── recordings/
 │   │   ├── volunteers-guide.spec.js       # Główny skrypt nagrania
 │   │   └── volunteers-guide.story.js      # Story builder z definicjami
@@ -114,7 +115,7 @@ eden-demo-automation/
 sequenceDiagram
     participant Test as volunteers-guide.spec.js
     participant Story as volunteers-guide.story.js
-    participant Locale as locale/volunteers/pl.json
+    participant Locale as locale/volunteers/pl_captions.json
     participant Helpers as eden-demo.js
     participant Page as Browser Page
     
@@ -193,7 +194,7 @@ module.exports = {
 }
 ```
 
-### 2. Locale File (`locale/volunteers/pl.json`)
+### 2. Locale Files (`locale/volunteers/pl_captions.json`, `locale/volunteers/pl_values.json`)
 
 ```json
 {

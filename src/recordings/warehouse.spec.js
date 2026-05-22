@@ -1,8 +1,6 @@
 const path = require('path');
 const { test, expect } = require('playwright/test');
-const locale = require('../locale/warehouse/en.json');
-const values = require('../locale/warehouse/en_values.json');
-const { localeText } = require('../helpers/locale');
+const { loadRecordingLocale, localeText } = require('../helpers/locale');
 const { RECORDING_VIEWPORT } = require('../helpers/recording-size');
 const {
   describeFormFields,
@@ -24,6 +22,8 @@ const {
   saveRecordedVideo,
   showStandaloneCaption,
 } = require('../helpers/eden-demo');
+
+const { captions: locale, values } = loadRecordingLocale('warehouse');
 
 function t(key, fallback = '') {
   return localeText(locale, key, fallback);
@@ -163,7 +163,7 @@ async function createSetupOrganization(page, organizationName) {
 
 test('records warehouse guide', async ({ browser, baseURL }) => {
   const user = loadEnvCredentials();
-  const content = buildDemoContent('warehouse');
+  const content = buildDemoContent('warehouse', values);
   const setupContext = await browser.newContext({ baseURL });
   const setupPage = await setupContext.newPage();
 

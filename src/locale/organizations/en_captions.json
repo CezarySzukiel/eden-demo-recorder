@@ -18,7 +18,6 @@
   "org_year": "Year the organization was founded (optional)",
   "org_logo": "Organization logo - file upload field (optional)",
   "org_comments": "Description and notes about the organization (optional)",
-  "org_comments_value": "An organization supporting local aid activities.",
 
   "office_name": "Office name",
   "office_code": "Office code (optional)",
@@ -37,7 +36,6 @@
   "office_email": "Office email address (optional)",
   "office_fax": "Fax number (optional)",
   "office_comments": "Office notes (optional)",
-  "office_comments_value": "Main office coordinating activities in Warsaw.",
 
   "facility_name": "Facility name",
   "facility_code": "Facility code (optional)",
@@ -58,6 +56,5 @@
   "facility_phone2": "Facility phone 2 (optional)",
   "facility_email": "Facility email address (optional)",
   "facility_website": "Facility website (optional)",
-  "facility_comments": "Facility notes (optional)",
-  "facility_comments_value": "A facility supporting the distribution of in-kind aid."
+  "facility_comments": "Facility notes (optional)"
 }

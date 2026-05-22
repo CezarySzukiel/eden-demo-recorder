@@ -18,7 +18,6 @@
   "org_year": "Rok założenia organizacji (opcjonalne)",
   "org_logo": "Logo organizacji - pole uploadu pliku (opcjonalne)",
   "org_comments": "Opis i uwagi do organizacji (opcjonalne)",
-  "org_comments_value": "Organizacja wspierająca lokalne działania pomocowe.",
 
   "office_name": "Nazwa biura",
   "office_code": "Kod biura (opcjonalne)",
@@ -37,7 +36,6 @@
   "office_email": "Adres e-mail biura (opcjonalne)",
   "office_fax": "Numer faksu (opcjonalne)",
   "office_comments": "Uwagi do biura (opcjonalne)",
-  "office_comments_value": "Główne biuro koordynujące działania w Warszawie.",
 
   "facility_name": "Nazwa placówki",
   "facility_code": "Kod placówki (opcjonalne)",
@@ -58,6 +56,5 @@
   "facility_phone2": "Telefon 2 placówki (opcjonalne)",
   "facility_email": "Adres e-mail placówki (opcjonalne)",
   "facility_website": "Strona internetowa placówki (opcjonalne)",
-  "facility_comments": "Uwagi do placówki (opcjonalne)",
-  "facility_comments_value": "Placówka wspierająca wydawanie pomocy rzeczowej."
+  "facility_comments": "Uwagi do placówki (opcjonalne)"
 }

@@ -1,6 +1,6 @@
 const path = require('path');
 const { test } = require('playwright/test');
-const locale = require('../locale/organizations/en.json');
+const { loadRecordingLocale } = require('../helpers/locale');
 const { RECORDING_VIEWPORT } = require('../helpers/recording-size');
 const { buildOrganizationSetupStory } = require('./organization-setup.story');
 const {
@@ -20,9 +20,11 @@ const {
   createOrganization,
 } = require('../helpers/organization-flow');
 
+const { captions: locale, values } = loadRecordingLocale('organizations');
+
 test('records organization setup scenario', async ({ browser, baseURL }) => {
   const user = loadEnvCredentials();
-  const content = buildDemoContent('org');
+  const content = buildDemoContent('org', values);
   const story = buildOrganizationSetupStory(locale, content);
   const setupContext = await browser.newContext({ baseURL });
   const setupPage = await setupContext.newPage();

@@ -1,7 +1,6 @@
 const path = require('path');
 const { test } = require('playwright/test');
-const locale = require('../locale/volunteers/pl.json');
-const values = require('../locale/volunteers/en_values.json');
+const { loadRecordingLocale } = require('../helpers/locale');
 const { RECORDING_VIEWPORT } = require('../helpers/recording-size');
 const { buildVolunteersStory } = require('./volunteers-guide.story');
 const { describeFormFields, showPageStep, showCreateFormStep } = require('../helpers/recording-steps');
@@ -18,6 +17,8 @@ const {
   showStandaloneCaption,
   navigateViaHref,
 } = require('../helpers/eden-demo');
+
+const { captions: locale, values } = loadRecordingLocale('volunteers');
 
 function v(key, fallback = '') {
   return values[key] ?? fallback;

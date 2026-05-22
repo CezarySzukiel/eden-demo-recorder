@@ -9,6 +9,11 @@
 const { expect } = require('playwright/test');
 const fs = require('fs');
 const path = require('path');
+const {
+  getOptionalBooleanEnv,
+  getRequiredNumberEnv,
+  getRequiredStringEnv,
+} = require('./env');
 
 /**
  * WeakMap to track caption state per page for timing calculations.
@@ -22,106 +27,6 @@ const captionState = new WeakMap();
 const CURSOR_OFFSET_X = 24;
 const CURSOR_OFFSET_Y = 16;
 const MIN_WORD_LENGTH = 3;
-
-/**
- * Parses the repository .env file using the project's intentionally small
- * key=value format.
- *
- * Environment variables from process.env still win; this parser only provides
- * local fallback values for demo scripts without introducing dotenv semantics.
- *
- * @returns {Object<string, string>} Parsed environment values.
- */
-function parseEnvFile() {
-  const envPath = path.join(process.cwd(), '.env');
-  const values = {};
-
-  if (!fs.existsSync(envPath)) {
-    return values;
-  }
-
-  const content = fs.readFileSync(envPath, 'utf8');
-  for (const line of content.split(/\r?\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed || trimmed.startsWith('#')) {
-      continue;
-    }
-
-    const separatorIndex = trimmed.indexOf('=');
-    if (separatorIndex === -1) {
-      continue;
-    }
-
-    const key = trimmed.slice(0, separatorIndex).trim();
-    const value = trimmed.slice(separatorIndex + 1).trim();
-    values[key] = value;
-  }
-
-  return values;
-}
-
-const ENV_VALUES = parseEnvFile();
-
-/**
- * Retrieves environment variable value.
- *
- * @param {string} name - Environment variable name.
- * @returns {string|undefined} Environment variable value or undefined.
- */
-function getEnvValue(name) {
-  if (process.env[name] !== undefined) {
-    return process.env[name];
-  }
-  return ENV_VALUES[name];
-}
-
-/**
- * Gets required numeric environment variable.
- *
- * @param {string} name - Environment variable name.
- * @returns {number} Parsed numeric value.
- * @throws {Error} If variable is missing or not a valid number.
- */
-function getRequiredNumberEnv(name) {
-  const rawValue = getEnvValue(name);
-  const parsed = Number(rawValue);
-
-  if (rawValue === undefined || Number.isNaN(parsed)) {
-    throw new Error(`Missing numeric environment setting: ${name}`);
-  }
-
-  return parsed;
-}
-
-/**
- * Gets required string environment variable.
- *
- * @param {string} name - Environment variable name.
- * @returns {string} Environment variable value.
- * @throws {Error} If variable is missing or empty.
- */
-function getRequiredStringEnv(name) {
-  const value = getEnvValue(name);
-  if (!value) {
-    throw new Error(`Missing environment setting: ${name}`);
-  }
-  return value;
-}
-
-/**
- * Reads an optional boolean environment flag.
- *
- * @param {string} name - Environment variable name.
- * @returns {boolean} True when the value is a common truthy string.
- */
-function getOptionalBooleanEnv(name) {
-  const value = getEnvValue(name);
-  if (value === undefined) {
-    return false;
-  }
-
-  return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
-}
 
 const ACTION_DELAY_MS = getRequiredNumberEnv('EDEN_ACTION_DELAY_MS');
 const TYPE_DELAY_MS = getRequiredNumberEnv('EDEN_TYPE_DELAY_MS');
@@ -145,37 +50,64 @@ const RECORDING_FINISH_DELAY_MS = getRequiredNumberEnv('EDEN_RECORDING_FINISH_DE
 const USER_PASSWORD = getRequiredStringEnv('EDEN_TEST_PASSWORD');
 const HIDE_DEMO_CAPTIONS = getOptionalBooleanEnv('EDEN_HIDE_CAPTIONS');
 
+const DEFAULT_DEMO_CONTENT_TEMPLATES = {
+  organizationName: 'Demo NGO Aid Network {suffix}',
+  officeName: 'Warsaw Office {suffix}',
+  facilityName: 'Distribution Point {suffix}',
+  resourceTypeName: 'Blankets {suffix}',
+};
+
+function renderDemoValue(value, tokens) {
+  if (typeof value === 'string') {
+    return value.replace(/\{(\w+)\}/g, (match, tokenName) => (
+      tokens[tokenName] === undefined ? match : tokens[tokenName]
+    ));
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((entry) => renderDemoValue(entry, tokens));
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, entry]) => [key, renderDemoValue(entry, tokens)]),
+    );
+  }
+
+  return value;
+}
+
 /**
- * Builds unique demo content with timestamp-based suffix.
+ * Builds unique demo content with timestamp-based tokens.
  *
- * Generates unique names for organizations, offices, and facilities
- * to avoid conflicts when running multiple tests.
+ * Generates unique names and values to avoid conflicts when running multiple
+ * tests. Optional templates keep scenario data in values fixtures instead of
+ * hardcoding it in story builders.
  *
  * @param {string} [prefix='demo'] - Prefix for the generated suffix.
- * @returns {Object} Object containing unique names for demo entities.
- * @returns {string} return.suffix - The generated suffix.
- * @returns {string} return.organizationName - Unique organization name.
- * @returns {string} return.officeName - Unique office name.
- * @returns {string} return.facilityName - Unique facility name.
- * @returns {string} return.resourceTypeName - Unique resource type name.
+ * @param {Object} [templates] - Template values using {suffix} and {runId}.
+ * @returns {Object} Object containing rendered demo values.
+ * @returns {string} return.runId - Timestamp token in base36.
+ * @returns {string} return.suffix - Prefix plus runId.
  *
  * @example
- * const content = buildDemoContent('test');
- * // Returns: {
- * //   suffix: 'test-abc123',
- * //   organizationName: 'Demo NGO Aid Network test-abc123',
- * //   ...
- * // }
+ * const content = buildDemoContent('test', {
+ *   organizationName: 'Demo NGO Aid Network {suffix}',
+ *   organizationAcronym: 'DNA-{runId}',
+ * });
  */
-function buildDemoContent(prefix = 'demo') {
+function buildDemoContent(prefix = 'demo', templates = DEFAULT_DEMO_CONTENT_TEMPLATES) {
   const stamp = Date.now().toString(36);
   const suffix = `${prefix}-${stamp}`;
-  return {
+  const tokens = {
+    prefix,
+    runId: stamp,
     suffix,
-    organizationName: `Demo NGO Aid Network ${suffix}`,
-    officeName: `Warsaw Office ${suffix}`,
-    facilityName: `Distribution Point ${suffix}`,
-    resourceTypeName: `Blankets ${suffix}`,
+  };
+
+  return {
+    ...tokens,
+    ...renderDemoValue(templates, tokens),
   };
 }
 

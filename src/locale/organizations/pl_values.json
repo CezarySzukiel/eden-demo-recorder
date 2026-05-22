@@ -1,0 +1,45 @@
+{
+  "organizationName": "Demo Sieć Pomocy {suffix}",
+  "organizationAcronym": "DSP-{runId}",
+  "organizationCountry": {
+    "label": "Poland"
+  },
+  "organizationPhone": "+48 22 100 20 30",
+  "organizationWebsite": "https://demo-pomoc.example.org",
+  "organizationYear": "2015",
+  "organizationComments": "Organizacja wspierająca lokalne działania pomocowe.",
+
+  "officeName": "Biuro Warszawa {suffix}",
+  "officeCode": "BW-{runId}",
+  "officeType": {
+    "label": "Headquarters"
+  },
+  "officeCountry": {
+    "label": "Poland"
+  },
+  "officeAddress": "Aleja Centralna 1",
+  "officePostcode": "00-001",
+  "officePhone1": "+48 22 111 22 33",
+  "officePhone2": "+48 22 111 22 44",
+  "officeEmail": "biuro.warszawa@example.org",
+  "officeFax": "+48 22 111 22 55",
+  "officeComments": "Główne biuro koordynujące działania w Warszawie.",
+
+  "facilityName": "Punkt Dystrybucji {suffix}",
+  "facilityCode": "PD-{runId}",
+  "facilityCountry": {
+    "label": "Poland"
+  },
+  "facilityAddress": "Ulica Logistyczna 10",
+  "facilityPostcode": "00-950",
+  "facilityOpeningTimes": "Pon-pt 08:00-18:00",
+  "facilityContact": "Anna Kowalska",
+  "facilityPhone1": "+48 22 222 33 44",
+  "facilityPhone2": "+48 22 222 33 55",
+  "facilityEmail": "punkt.dystrybucji@example.org",
+  "facilityWebsite": "https://punkt-dystrybucji.example.org",
+  "facilityComments": "Placówka wspierająca wydawanie pomocy rzeczowej.",
+
+  "resourceTypeName": "Koce {suffix}",
+  "resourceQuantity": "500"
+}
