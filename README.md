@@ -2,6 +2,40 @@
 
 Playwright automation for recording Sahana Eden demo walkthroughs.
 
+## Quick Start
+
+Install project dependencies:
+
+```bash
+npm install
+```
+
+Prepare local settings from the example file:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and set at least:
+
+- `EMAIL` and `PASSWORD` - credentials for an existing Eden user.
+- `EDEN_BASE_URL` - Eden URL, if different from `http://127.0.0.1:8000/eden`.
+- `EDEN_RECORDING_LANGUAGE` - `en` or `pl`.
+
+Start the Sahana Eden application in a separate terminal. For a standard local
+web2py-based Eden checkout, the command is typically:
+
+```bash
+cd /path/to/web2py
+python3 web2py.py -a '<admin-password>' -i 127.0.0.1 -p 8000
+```
+
+After Eden is available at `http://127.0.0.1:8000/eden`, run a recording:
+
+```bash
+npm run warehouse
+```
+
 ## Available Commands
 
 - `npm test` - runs the full end-to-end flow with an organization, office, facility, and resource.
