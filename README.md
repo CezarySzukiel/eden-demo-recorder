@@ -1,100 +1,74 @@
 # Eden Demo Automation
 
-Scenariusze Playwright do nagrywania przewodnikow po Sahana Eden.
+Playwright automation for recording Sahana Eden demo walkthroughs.
 
-## Dostepne komendy
+## Available Commands
 
-- `npm test` - uruchamia pelny test end-to-end z organizacja, biurem, facility i zasobem
-- `npm run organizations` - nagrywa scenariusz organizacja + biuro + facility
-- `npm run warehouses` - nagrywa przewodnik po module Warehouses
-- `npm run warehouses_extended` - nagrywa rozszerzony przewodnik po Warehouses (teksty z `src/locale/warehouse/pl_gpt.json`)
-- `npm run warehouses_overview` - nagrywa szybki przeglad glownej nawigacji w Warehouses (1 sekunda na zakladke)
+- `npm test` - runs the full end-to-end flow with an organization, office, facility, and resource.
+- `npm run organizations` - records the organization setup scenario.
+- `npm run organizations_no_captions` - records the organization setup scenario with hidden captions.
+- `npm run warehouse` - records the canonical Warehouse guide.
+- `npm run warehouse_no_captions` - records the canonical Warehouse guide with hidden captions.
+- `npm run volunteers` - records the Volunteers guide.
+- `npm run volunteers_no_captions` - records the Volunteers guide with hidden captions.
 
-Domyslny adres aplikacji:
+Default application URL:
 
 - `http://127.0.0.1:8000/eden`
 
-## Gdzie trafia nagranie
+## Recording Output
 
-Po uruchomieniu `npm run organizations` video zapisuje sie w katalogu:
+Recorded videos are saved under:
 
 - `artifacts/demo-results/`
 
-Playwright tworzy tam podkatalog testu z plikiem `video.webm`.
-Pliki techniczne Playwright trafiaja do `artifacts/playwright-output/` (katalog moze byc czyszczony przy starcie testu).
+Playwright technical output is written under `artifacts/playwright-output/`,
+which may be cleaned at the start of a test run.
 
-## Ustawienia
+## Settings
 
-- `EDEN_BASE_URL` - adres instancji Eden, domyslnie `http://127.0.0.1:8000/eden`
-- `EDEN_TEST_PASSWORD` - haslo dla nowo rejestrowanego konta
-- `EDEN_RECORDING_WIDTH` - szerokosc nagrania, domyslnie `1600`
-- `EDEN_RECORDING_HEIGHT` - wysokosc nagrania, domyslnie `900`
-- `EDEN_ACTION_DELAY_MS` - opoznienie po akcji, zanim scenariusz przejdzie dalej
-- `EDEN_TYPE_DELAY_MS` - opoznienie na znak przy wpisywaniu
-- `EDEN_CURSOR_MOVE_STEPS` - liczba krokow animacji ruchu kursora
-- `EDEN_CURSOR_MOVE_SETTLE_MS` - krotka pauza po dojechaniu kursora do celu
-- `EDEN_NAVIGATION_CLICK_PAUSE_MS` - pauza po najechaniu na link/menu przed kliknieciem
-- `EDEN_NAVIGATION_POST_CLICK_MS` - krotka pauza po animacji klikniecia w nawigacji
-- `EDEN_CURSOR_CLICK_VISUAL_MS` - czas trwania wizualnego efektu klikniecia kursora
-- `EDEN_POST_CURSOR_CLICK_DELAY_MS` - pauza miedzy animacja klikniecia a faktycznym wpisywaniem/wyborem
-- `EDEN_DEFAULT_CAPTION_DELAY_MS` - bazowy czas captionu dla zwyklych krokow
-- `EDEN_DEFAULT_HOVER_DELAY_MS` - bazowy czas captionu dla opisow hover
-- `EDEN_OPTIONAL_HOVER_DELAY_MS` - bazowy czas captionu dla opcjonalnych pol
-- `EDEN_RECORDING_FINISH_DELAY_MS` - pauza przed zapisaniem i zamknieciem nagrania
-- `SECONDS_PER_WORD` - czas wyswietlania napisu na jedno slowo
-- `MAX_SECONDS_PER_WRITING` - limit sekund wynikajacy z dlugosci tekstu
-- `MAX_CAPTION_DELAY_MS` - twardy gorny limit czasu captionu
+- `EDEN_BASE_URL` - Eden instance URL, defaulting to `http://127.0.0.1:8000/eden`.
+- `EDEN_TEST_PASSWORD` - password for newly registered test accounts.
+- `EMAIL` and `PASSWORD` - credentials for existing-user recording flows.
+- `EDEN_RECORDING_WIDTH` - recording width, defaulting to `1600`.
+- `EDEN_RECORDING_HEIGHT` - recording height, defaulting to `900`.
+- `EDEN_ACTION_DELAY_MS` - delay after an action before continuing.
+- `EDEN_TYPE_DELAY_MS` - delay per typed character.
+- `EDEN_CURSOR_MOVE_STEPS` - number of cursor animation steps.
+- `EDEN_CURSOR_MOVE_SETTLE_MS` - pause after the cursor reaches its target.
+- `EDEN_NAVIGATION_CLICK_PAUSE_MS` - pause before clicking navigation links.
+- `EDEN_NAVIGATION_POST_CLICK_MS` - pause after navigation click animation.
+- `EDEN_CURSOR_CLICK_VISUAL_MS` - cursor click visual duration.
+- `EDEN_POST_CURSOR_CLICK_DELAY_MS` - pause between click animation and input.
+- `EDEN_DEFAULT_CAPTION_DELAY_MS` - default delay for standard captions.
+- `EDEN_DEFAULT_HOVER_DELAY_MS` - default delay for hover descriptions.
+- `EDEN_OPTIONAL_HOVER_DELAY_MS` - default delay for optional field descriptions.
+- `EDEN_RECORDING_FINISH_DELAY_MS` - pause before saving the recording.
+- `EDEN_HIDE_CAPTIONS` - set to `1` to hide caption text and background while preserving caption timing.
+- `SECONDS_PER_WORD` - caption display time per word.
+- `MAX_SECONDS_PER_WRITING` - maximum caption time from text length.
+- `MAX_CAPTION_DELAY_MS` - hard maximum caption display time.
 
-Domyslny rozmiar nagrania to `1600x900`, bo w trybie z podgladem
-pelne `1920x1080` czesto nie miesci sie w oknie Chromium razem z ramka
-przegladarki. Gdy faktyczny viewport jest mniejszy niz rozmiar video,
-Playwright dopelnia brakujace miejsce szarym tlem po prawej i na dole.
-Jesli nagrywasz bez podgladu albo masz wiekszy ekran, mozesz wymusic
-Full HD:
+The default recording size is `1600x900` because non-headless recordings often
+need to fit the Chromium window frame on screen. If your display can handle Full
+HD, override the recording size:
 
 ```bash
-EDEN_RECORDING_WIDTH=1920 EDEN_RECORDING_HEIGHT=1080 npm run organizations
+EDEN_RECORDING_WIDTH=1920 EDEN_RECORDING_HEIGHT=1080 npm run warehouse
 ```
 
-## Pierwszy scenariusz
+## Warehouse Guide
 
-Nagrywany flow:
+The canonical Warehouse recording is based on the former extended flow. It logs
+in, prepares the required organization data, records the Warehouse module, and
+walks through setup data, catalogs, suppliers, warehouses, receipts, shipments,
+requests, commitments, distributions, stock counts, stock count items, reports,
+and integration notes.
 
-1. Rejestracja uzytkownika
-2. Logowanie
-3. Wejscie do Organizations
-4. Utworzenie organizacji `Demo NGO Aid Network`
-5. Utworzenie biura `Warsaw Office`
-6. Utworzenie facility `Distribution Point`
+## Stable Output Files
 
-## Warehouses Guide
-
-Nagrywany flow:
-
-1. Logowanie
-2. Wejscie do modulu Warehouses
-3. Krotkie intro: czym jest modul i do czego sluzy
-4. Przeglad podstawowych danych konfiguracyjnych:
-5. Warehouse Types
-6. Catalogs
-7. Item Categories
-8. Items
-9. Suppliers
-10. Warehouse
-11. Received Shipments
-12. Requests
-13. Match Requests i Commit
-14. Sent Shipments
-15. Odbior po drugiej stronie
-16. Distributions
-17. Adjust Stock Levels
-18. Reports
-
-Nagrania sa zapisywane jako stale pliki:
+Repeated runs overwrite only their own recording file:
 
 - `artifacts/demo-results/organization-setup.webm`
-- `artifacts/demo-results/warehouses-guide.webm`
-- `artifacts/demo-results/warehouses-extended.webm`
-- `artifacts/demo-results/warehouses-overview.webm`
-
-Ponowne uruchomienie tego samego nagrania nadpisuje tylko jego wlasny plik.
+- `artifacts/demo-results/warehouse.webm`
+- `artifacts/demo-results/volunteers-guide.webm`

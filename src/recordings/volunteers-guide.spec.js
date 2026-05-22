@@ -1,6 +1,7 @@
 const path = require('path');
 const { test } = require('playwright/test');
 const locale = require('../locale/volunteers/pl.json');
+const values = require('../locale/volunteers/en_values.json');
 const { RECORDING_VIEWPORT } = require('../helpers/recording-size');
 const { buildVolunteersStory } = require('./volunteers-guide.story');
 const { describeFormFields, showPageStep, showCreateFormStep } = require('../helpers/recording-steps');
@@ -17,6 +18,19 @@ const {
   showStandaloneCaption,
   navigateViaHref,
 } = require('../helpers/eden-demo');
+
+function v(key, fallback = '') {
+  return values[key] ?? fallback;
+}
+
+function templateValue(key, replacements, fallback = '') {
+  const value = v(key, fallback);
+  if (typeof value !== 'string') {
+    return fallback;
+  }
+
+  return value.replace(/\{(\w+)\}/g, (match, name) => replacements[name] ?? match);
+}
 
 async function completeCreateForm(page, config, delay = 1800) {
   await showCreateFormStep(page, {
@@ -160,20 +174,45 @@ test('records volunteers guide', async ({ browser, baseURL }) => {
   // Phase 1: Setup - Load credentials and build story
   const user = loadEnvCredentials();
   const content = buildDemoContent('vol');
+  const teamName = templateValue('team_name', { suffix: content.suffix }, `Rescue Team ${content.suffix}`);
+  const trainingName = templateValue('training_name', { suffix: content.suffix }, `First Aid Training ${content.suffix}`);
+  const programName = templateValue('program_name', { suffix: content.suffix }, `Winter Assistance Program ${content.suffix}`);
   
   // Build demo content with unique names
   const demoContent = {
     ...content,
-    skillName: 'Pierwsza pomoc',
-    roleName: 'Ratownik medyczny',
-    certificateName: 'Certyfikat pierwszej pomocy',
-    courseName: 'Podstawy pierwszej pomocy',
-    volunteerFirstName: 'Jan',
-    volunteerLastName: 'Kowalski',
-    volunteerEmail: 'jan.kowalski@example.com',
-    teamName: `Zespół ratowniczy ${content.suffix}`,
-    trainingName: `Szkolenie pierwszej pomocy ${content.suffix}`,
-    programName: `Program pomocy zimowej ${content.suffix}`,
+    skillName: v('skill_name', 'First aid'),
+    skillComments: v('skill_comments', 'A skill required during emergency response operations.'),
+    roleName: v('role_name', 'Medical responder'),
+    roleComments: v('role_comments', 'Role requiring a valid first aid certificate.'),
+    certificateName: v('certificate_name', 'First aid certificate'),
+    certificateExpiry: v('certificate_expiry', '24'),
+    courseCode: v('course_code', 'FA-101'),
+    courseName: v('course_name', 'First aid basics'),
+    courseHours: v('course_hours', '16'),
+    courseUrl: v('course_url', 'https://example.org/courses/first-aid'),
+    courseComments: v('course_comments', 'The course covers first aid theory and practice.'),
+    volunteerFirstName: v('volunteer_first_name', 'John'),
+    volunteerLastName: v('volunteer_last_name', 'Carter'),
+    volunteerEmail: v('volunteer_email', 'john.carter@example.com'),
+    volunteerDateOfBirth: v('volunteer_date_of_birth', '1990-05-15'),
+    volunteerGender: v('volunteer_gender', { index: 2 }),
+    volunteerOccupation: v('volunteer_occupation', 'Emergency responder'),
+    volunteerPhone: v('volunteer_phone', '+48 600 123 456'),
+    volunteerStartDate: v('volunteer_start_date', '2026-01-01'),
+    volunteerEndDate: v('volunteer_end_date', '2026-12-31'),
+    teamName,
+    teamDescription: v('team_description', 'Rescue team operating in the Warsaw area.'),
+    teamComments: v('team_comments', 'Team available 24/7 for emergency response.'),
+    trainingName,
+    trainingDate: v('training_date', '2026-06-15'),
+    trainingEndDate: v('training_end_date', '2026-06-16'),
+    trainingDuration: v('training_duration', '16'),
+    trainingInstructor: v('training_instructor', 'Dr Emily Carter'),
+    trainingComments: v('training_comments', 'Training includes both theory and practical exercises.'),
+    programName,
+    programDescription: templateValue('program_description', { programName }, `${programName} - long-term volunteer programme.`),
+    programComments: v('program_comments', 'Assistance programme for people in need during winter.'),
   };
   
   const story = buildVolunteersStory(locale, demoContent);

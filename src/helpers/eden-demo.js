@@ -108,6 +108,21 @@ function getRequiredStringEnv(name) {
   return value;
 }
 
+/**
+ * Reads an optional boolean environment flag.
+ *
+ * @param {string} name - Environment variable name.
+ * @returns {boolean} True when the value is a common truthy string.
+ */
+function getOptionalBooleanEnv(name) {
+  const value = getEnvValue(name);
+  if (value === undefined) {
+    return false;
+  }
+
+  return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase());
+}
+
 const ACTION_DELAY_MS = getRequiredNumberEnv('EDEN_ACTION_DELAY_MS');
 const TYPE_DELAY_MS = getRequiredNumberEnv('EDEN_TYPE_DELAY_MS');
 const SECONDS_PER_WORD = getRequiredNumberEnv('SECONDS_PER_WORD');
@@ -128,6 +143,7 @@ const NAVIGATION_WAIT_TIMEOUT_MS = getRequiredNumberEnv('EDEN_NAVIGATION_WAIT_TI
 const NAVIGATION_DESTINATION_TIMEOUT_MS = getRequiredNumberEnv('EDEN_NAVIGATION_DESTINATION_TIMEOUT_MS');
 const RECORDING_FINISH_DELAY_MS = getRequiredNumberEnv('EDEN_RECORDING_FINISH_DELAY_MS');
 const USER_PASSWORD = getRequiredStringEnv('EDEN_TEST_PASSWORD');
+const HIDE_DEMO_CAPTIONS = getOptionalBooleanEnv('EDEN_HIDE_CAPTIONS');
 
 /**
  * Builds unique demo content with timestamp-based suffix.
@@ -249,14 +265,20 @@ async function enableDemoCursor(page) {
  * Must be called before page navigation.
  *
  * @param {import('playwright').Page} page - The Playwright page object.
+ * @param {Object} [options] - Caption rendering options.
+ * @param {boolean} [options.hidden] - Keep caption timing but render captions transparent.
  * @returns {Promise<void>}
  *
  * @example
  * await enableDemoCaptions(page);
  * await page.goto('/eden/org/index');
  */
-async function enableDemoCaptions(page) {
-  await page.addInitScript(() => {
+async function enableDemoCaptions(page, options = {}) {
+  const hidden = options.hidden ?? HIDE_DEMO_CAPTIONS;
+
+  await page.addInitScript((captionOptions) => {
+    const hiddenCaptions = Boolean(captionOptions.hidden);
+
     if (window.__edenDemoCaptionsInstalled) {
       return;
     }
@@ -289,7 +311,7 @@ async function enableDemoCaptions(page) {
           transition: opacity 0.18s ease-out;
         }
         #eden-demo-caption.eden-demo-caption-visible {
-          opacity: 1;
+          opacity: ${hiddenCaptions ? 0 : 1};
         }
       `;
       document.documentElement.appendChild(style);
@@ -319,7 +341,7 @@ async function enableDemoCaptions(page) {
     } else {
       installCaptions();
     }
-  });
+  }, { hidden });
 }
 
 /**

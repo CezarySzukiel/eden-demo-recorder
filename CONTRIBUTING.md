@@ -42,6 +42,16 @@ not code defaults. If a change affects any of these, call it out in review:
 - `EDEN_NAVIGATION_DESTINATION_TIMEOUT_MS`
 - `EDEN_RECORDING_FINISH_DELAY_MS`
 
+`EDEN_HIDE_CAPTIONS=1` is optional and should only change caption visibility.
+Caption functions must still run so word-count delays and scenario length stay
+unchanged.
+
+## Recording Commands
+
+- Use `npm run warehouse` for the canonical Warehouse recording.
+- Use `npm run warehouse_no_captions` for the same flow with hidden captions.
+- Do not add separate basic, extended, or overview Warehouse recording variants.
+
 ## Recording Helpers
 
 - Call `enableDemoCursor()` and `enableDemoCaptions()` before navigation in a

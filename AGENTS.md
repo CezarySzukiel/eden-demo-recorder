@@ -35,7 +35,7 @@ npx playwright test -c playwright.demo.config.js organization-setup.spec.js
 
 # Or use npm scripts
 npm run organizations
-npm run warehouses
+npm run warehouse
 ```
 
 ## Code Style

@@ -97,5 +97,17 @@
   "distribution_date": "2026-05-05",
   "distribution_staff_member": "Peter Miller",
   "distribution_recipient": "Alice Carter",
-  "stock_count_comments": "Control stock count before closing the shift."
+  "stock_count_comments": "Control stock count before closing the shift.",
+  "stock_count_item": "First aid kit",
+  "stock_count_item_suggestion": "First aid kit",
+  "stock_count_pack": {
+    "label": "piece"
+  },
+  "stock_count_revised_quantity": "24",
+  "stock_count_revised_status": {
+    "label": "Surplus"
+  },
+  "stock_count_expiry_date": "2026-12-31",
+  "stock_count_bin": "Rack B-12",
+  "stock_count_item_comments": "Count confirmed during the evening check."
 }

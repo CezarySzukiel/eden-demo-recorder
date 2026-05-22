@@ -105,6 +105,11 @@ function select(selector, key, value, options = {}) {
   return field(selector, 'select', key, value, options);
 }
 
+function contentValue(content, key, fallback = '') {
+  const value = content[key];
+  return value === undefined ? fallback : value;
+}
+
 /**
  * Build skill catalog record
  */
@@ -117,7 +122,7 @@ function buildSkillRecord(locale, content) {
     resultCellName: content.skillName,
     fields: [
       fill('#hrm_skill_name', 'skill_name', content.skillName, options),
-      fill('#hrm_skill_comments', 'skill_type', 'Umiejętność niezbędna w akcjach ratunkowych', { ...options, ifVisible: true }),
+      fill('#hrm_skill_comments', 'skill_type', contentValue(content, 'skillComments', 'A skill required during emergency response operations.'), { ...options, ifVisible: true }),
     ],
   };
 }
@@ -135,7 +140,7 @@ function buildRoleRecord(locale, content) {
     fields: [
       fill('#hrm_job_title_name', 'role_name', content.roleName, options),
       select('#hrm_job_title_type', 'role_type', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
-      fill('#hrm_job_title_comments', 'role_type', 'Rola wymagająca certyfikatu pierwszej pomocy', { ...options, ifVisible: true }),
+      fill('#hrm_job_title_comments', 'role_type', contentValue(content, 'roleComments', 'Role requiring a valid first aid certificate.'), { ...options, ifVisible: true }),
     ],
   };
 }
@@ -153,7 +158,7 @@ function buildCertificateRecord(locale, content) {
     fields: [
       fill('#hrm_certificate_name', 'certificate_name', content.certificateName, options),
       select('#hrm_certificate_organisation_id', 'certificate_organization', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
-      fill('#hrm_certificate_expiry', 'certificate_expiry', '24', { ...options, ifVisible: true }),
+      fill('#hrm_certificate_expiry', 'certificate_expiry', contentValue(content, 'certificateExpiry', '24'), { ...options, ifVisible: true }),
     ],
   };
 }
@@ -169,12 +174,12 @@ function buildCourseRecord(locale, content) {
     firstSelector: '#hrm_course_name',
     resultCellName: content.courseName,
     fields: [
-      fill('#hrm_course_code', 'course_code', 'PP-101', { ...options, ifVisible: true }),
+      fill('#hrm_course_code', 'course_code', contentValue(content, 'courseCode', 'FA-101'), { ...options, ifVisible: true }),
       fill('#hrm_course_name', 'course_name', content.courseName, options),
       select('#hrm_course_organisation_id', 'course_organization', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
-      fill('#hrm_course_hours', 'course_hours', '16', { ...options, ifVisible: true }),
-      fill('#hrm_course_url', 'course_url', 'https://example.org/courses/first-aid', { ...options, ifVisible: true, skipCaption: true }),
-      fill('#hrm_course_comments', 'course_comments', 'Kurs obejmuje teorię i praktykę pierwszej pomocy', { ...options, ifVisible: true }),
+      fill('#hrm_course_hours', 'course_hours', contentValue(content, 'courseHours', '16'), { ...options, ifVisible: true }),
+      fill('#hrm_course_url', 'course_url', contentValue(content, 'courseUrl', 'https://example.org/courses/first-aid'), { ...options, ifVisible: true, skipCaption: true }),
+      fill('#hrm_course_comments', 'course_comments', contentValue(content, 'courseComments', 'The course covers first aid theory and practice.'), { ...options, ifVisible: true }),
     ],
   };
 }
@@ -197,15 +202,15 @@ function buildVolunteerRecord(locale, content) {
     fields: [
       select('#hrm_human_resource_organisation_id', 'volunteer_organization', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable' }),
       fill('#hrm_human_resource_person_id_full_name', 'volunteer_first_name', fullName, { ...options, closeAutocomplete: true }),
-      fill('#hrm_human_resource_person_id_date_of_birth', 'volunteer_date_of_birth', '1990-05-15', { ...options, ifVisible: true }),
-      select('#hrm_human_resource_person_id_gender', 'volunteer_gender', { index: 2 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
-      fill('#hrm_human_resource_person_id_occupation', 'volunteer_type', 'Ratownik', { ...options, ifVisible: true }),
-      fill('#hrm_human_resource_person_id_mobile_phone', 'volunteer_phone', '+48 600 123 456', options),
+      fill('#hrm_human_resource_person_id_date_of_birth', 'volunteer_date_of_birth', contentValue(content, 'volunteerDateOfBirth', '1990-05-15'), { ...options, ifVisible: true }),
+      select('#hrm_human_resource_person_id_gender', 'volunteer_gender', contentValue(content, 'volunteerGender', { index: 2 }), { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
+      fill('#hrm_human_resource_person_id_occupation', 'volunteer_type', contentValue(content, 'volunteerOccupation', 'Emergency responder'), { ...options, ifVisible: true }),
+      fill('#hrm_human_resource_person_id_mobile_phone', 'volunteer_phone', contentValue(content, 'volunteerPhone', '+48 600 123 456'), options),
       fill('#hrm_human_resource_person_id_email', 'volunteer_email', content.volunteerEmail, options),
       select('#sub_defaultprogramme_hours_defaultprogramme_hours_i_programme_id_edit_none', 'volunteer_program', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
       select('#hrm_human_resource_job_title_id', 'volunteer_role', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
-      fill('#hrm_human_resource_start_date', 'volunteer_start_date', '2026-01-01', { ...options, ifVisible: true }),
-      fill('#hrm_human_resource_end_date', 'volunteer_end_date', '2026-12-31', { ...options, ifVisible: true }),
+      fill('#hrm_human_resource_start_date', 'volunteer_start_date', contentValue(content, 'volunteerStartDate', '2026-01-01'), { ...options, ifVisible: true }),
+      fill('#hrm_human_resource_end_date', 'volunteer_end_date', contentValue(content, 'volunteerEndDate', '2026-12-31'), { ...options, ifVisible: true }),
       describe('#hrm_human_resource_sub_volunteer_cluster_vol_cluster_type_id', 'volunteer_cluster_type', { ...options, ifVisible: true }),
     ],
   };
@@ -223,9 +228,9 @@ function buildTeamRecord(locale, content) {
     resultCellName: content.teamName,
     fields: [
       fill('#pr_group_name', 'team_name', content.teamName, options),
-      fill('#pr_group_description', 'team_description', 'Zespół ratowniczy działający w obszarze Warszawy', options),
+      fill('#pr_group_description', 'team_description', contentValue(content, 'teamDescription', 'Rescue team operating in the Warsaw area.'), options),
       select('#sub_defaultorganisation_team_defaultorganisation_team_i_organisation_id_edit_none', 'team_organization', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
-      fill('#pr_group_comments', 'team_comments', 'Zespół dostępny 24/7 w sytuacjach kryzysowych', { ...options, ifVisible: true }),
+      fill('#pr_group_comments', 'team_comments', contentValue(content, 'teamComments', 'Team available 24/7 for emergency response.'), { ...options, ifVisible: true }),
     ],
   };
 }
@@ -244,11 +249,11 @@ function buildTrainingEventRecord(locale, content) {
       select('#hrm_training_event_course_id', 'training_course', { index: 1 }, { ...options, fallbackSelect: 'firstAvailableOrSkip' }),
       select('#hrm_training_event_organisation_id', 'training_organized_by', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
       select('#hrm_training_event_site_id', 'training_location', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
-      fill('#hrm_training_event_start_date', 'training_date', '2026-06-15', { ...options, ifVisible: true }),
-      fill('#hrm_training_event_end_date', 'training_end_date', '2026-06-16', { ...options, ifVisible: true }),
-      fill('#hrm_training_event_hours', 'training_duration', '16', { ...options, ifVisible: true }),
-      fill('#hrm_training_event_instructor', 'training_instructor', 'Dr Jan Nowak', { ...options, ifVisible: true }),
-      fill('#hrm_training_event_comments', 'training_comments', 'Szkolenie obejmuje teorię i praktykę', { ...options, ifVisible: true }),
+      fill('#hrm_training_event_start_date', 'training_date', contentValue(content, 'trainingDate', '2026-06-15'), { ...options, ifVisible: true }),
+      fill('#hrm_training_event_end_date', 'training_end_date', contentValue(content, 'trainingEndDate', '2026-06-16'), { ...options, ifVisible: true }),
+      fill('#hrm_training_event_hours', 'training_duration', contentValue(content, 'trainingDuration', '16'), { ...options, ifVisible: true }),
+      fill('#hrm_training_event_instructor', 'training_instructor', contentValue(content, 'trainingInstructor', 'Dr Emily Carter'), { ...options, ifVisible: true }),
+      fill('#hrm_training_event_comments', 'training_comments', contentValue(content, 'trainingComments', 'Training includes both theory and practical exercises.'), { ...options, ifVisible: true }),
     ],
   };
 }
@@ -265,9 +270,9 @@ function buildProgramRecord(locale, content) {
     resultCellName: content.programName,
     fields: [
       fill('#hrm_programme_name', 'program_name', content.programName, options),
-      fill('#hrm_programme_name_long', 'program_description', `${content.programName} - Program długoterminowy`, { ...options, ifVisible: true }),
+      fill('#hrm_programme_name_long', 'program_description', contentValue(content, 'programDescription', `${content.programName} - long-term volunteer programme.`), { ...options, ifVisible: true }),
       select('#hrm_programme_organisation_id', 'program_organization', { index: 1 }, { ...options, fallbackSelect: 'firstAvailable', ifVisible: true }),
-      fill('#hrm_programme_comments', 'program_comments', 'Program pomocy dla osób potrzebujących w okresie zimowym', { ...options, ifVisible: true }),
+      fill('#hrm_programme_comments', 'program_comments', contentValue(content, 'programComments', 'Assistance programme for people in need during winter.'), { ...options, ifVisible: true }),
     ],
   };
 }
