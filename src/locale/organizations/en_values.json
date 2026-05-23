@@ -2,40 +2,40 @@
   "organizationName": "Demo NGO Aid Network {suffix}",
   "organizationAcronym": "DNA-{runId}",
   "organizationCountry": {
-    "label": "Poland"
+    "label": "United States"
   },
-  "organizationPhone": "+48 22 100 20 30",
+  "organizationPhone": "+1 202 555 0130",
   "organizationWebsite": "https://demo-ngo.example.org",
   "organizationYear": "2015",
   "organizationComments": "An organization supporting local aid activities.",
 
-  "officeName": "Warsaw Office {suffix}",
-  "officeCode": "WO-{runId}",
+  "officeName": "Austin Office {suffix}",
+  "officeCode": "O{runId}",
   "officeType": {
     "label": "Headquarters"
   },
   "officeCountry": {
-    "label": "Poland"
+    "label": "United States"
   },
-  "officeAddress": "1 Central Avenue",
-  "officePostcode": "00-001",
-  "officePhone1": "+48 22 111 22 33",
-  "officePhone2": "+48 22 111 22 44",
-  "officeEmail": "warsaw.office@example.org",
-  "officeFax": "+48 22 111 22 55",
-  "officeComments": "Main office coordinating activities in Warsaw.",
+  "officeAddress": "125 Market Street",
+  "officePostcode": "78701",
+  "officePhone1": "+1 512 555 0140",
+  "officePhone2": "+1 512 555 0141",
+  "officeEmail": "austin.office@example.org",
+  "officeFax": "+1 512 555 0142",
+  "officeComments": "Main office coordinating regional aid activities.",
 
   "facilityName": "Distribution Point {suffix}",
-  "facilityCode": "DP-{runId}",
+  "facilityCode": "F{runId}",
   "facilityCountry": {
-    "label": "Poland"
+    "label": "United States"
   },
-  "facilityAddress": "10 Logistics Street",
-  "facilityPostcode": "00-950",
+  "facilityAddress": "450 Logistics Drive",
+  "facilityPostcode": "78702",
   "facilityOpeningTimes": "Mon-Fri 08:00-18:00",
   "facilityContact": "Emily Carter",
-  "facilityPhone1": "+48 22 222 33 44",
-  "facilityPhone2": "+48 22 222 33 55",
+  "facilityPhone1": "+1 512 555 0150",
+  "facilityPhone2": "+1 512 555 0151",
   "facilityEmail": "distribution.point@example.org",
   "facilityWebsite": "https://distribution-point.example.org",
   "facilityComments": "A facility supporting the distribution of in-kind aid.",

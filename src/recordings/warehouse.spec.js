@@ -23,7 +23,7 @@ const {
   showStandaloneCaption,
 } = require('../helpers/eden-demo');
 
-const { captions: locale, values } = loadRecordingLocale('warehouse');
+const { language: recordingLanguage, captions: locale, values } = loadRecordingLocale('warehouse');
 
 function t(key, fallback = '') {
   return localeText(locale, key, fallback);
@@ -138,16 +138,57 @@ async function fillAutocompleteItem(page, {
   suggestionDescription,
   hiddenValueSelector,
 }) {
-  await describeAndFill(page.locator(inputSelector), description, typedValue);
-  const suggestion = page
-    .locator('ul.ui-autocomplete li')
+  const input = page.locator(inputSelector);
+  await input.waitFor({ state: 'visible' });
+  await showStandaloneCaption(page, description, 1200);
+  await input.click();
+  await input.fill('');
+  await input.fill(typedValue);
+
+  const autocomplete = page.locator('ul.ui-autocomplete:visible').first();
+  await expect(autocomplete).toBeVisible();
+  const hiddenValue = hiddenValueSelector ? page.locator(hiddenValueSelector) : null;
+
+  await showStandaloneCaption(page, suggestionDescription, 1200);
+  await page.keyboard.press('ArrowDown');
+  await page.keyboard.press('Enter');
+
+  if (hiddenValue) {
+    const selectedWithKeyboard = await hiddenValue
+      .evaluate((element) => element.value)
+      .catch(() => '');
+    if (selectedWithKeyboard) {
+      await expect(hiddenValue).not.toHaveValue('');
+      return;
+    }
+  }
+
+  const exactSuggestion = autocomplete
+    .locator('.ui-menu-item-wrapper, li')
     .filter({ hasText: new RegExp(`^${escapeRegExp(suggestionText)}$`, 'i') })
     .first();
-  await expect(suggestion).toBeVisible();
-  await describeAndClick(suggestion, suggestionDescription);
+  const containsSuggestion = autocomplete
+    .locator('.ui-menu-item-wrapper, li')
+    .filter({ hasText: new RegExp(escapeRegExp(suggestionText), 'i') })
+    .first();
 
-  if (hiddenValueSelector) {
-    await expect(page.locator(hiddenValueSelector)).not.toHaveValue('');
+  let suggestion = containsSuggestion;
+  if (await exactSuggestion.count()) {
+    suggestion = exactSuggestion;
+  } else if (!await containsSuggestion.count()) {
+    if (hiddenValue) {
+      await expect(hiddenValue).not.toHaveValue('');
+      return;
+    }
+
+    return;
+  }
+
+  await expect(suggestion).toBeVisible();
+  await suggestion.click();
+
+  if (hiddenValue) {
+    await expect(hiddenValue).not.toHaveValue('');
   }
 }
 
@@ -164,7 +205,7 @@ async function createSetupOrganization(page, organizationName) {
 test('records warehouse guide', async ({ browser, baseURL }) => {
   const user = loadEnvCredentials();
   const content = buildDemoContent('warehouse', values);
-  const setupContext = await browser.newContext({ baseURL });
+  const setupContext = await browser.newContext({ baseURL, locale: recordingLanguage });
   const setupPage = await setupContext.newPage();
 
   await loginUser(setupPage, user);
@@ -175,6 +216,7 @@ test('records warehouse guide', async ({ browser, baseURL }) => {
 
   const recordedContext = await browser.newContext({
     baseURL,
+    locale: recordingLanguage,
     storageState,
     viewport: RECORDING_VIEWPORT,
     recordVideo: {
@@ -308,7 +350,7 @@ test('records warehouse guide', async ({ browser, baseURL }) => {
       fillField('#inv_warehouse_name', 'warehouse_name', 'Name - warehouse name.'),
       fillField('#inv_warehouse_code', 'warehouse_code', 'Code - warehouse code.'),
       selectField('#inv_warehouse_organisation_id', 'warehouse_organization', 'Organization - warehouse owner organization.', 'warehouse_organization', { match: 'contains', value: content.organizationName }),
-      { selector: '#inv_warehouse_warehouse_type_id', key: 'warehouse_type', fallback: 'Warehouse Type - warehouse classification.' },
+      selectField('#inv_warehouse_warehouse_type_id', 'warehouse_type', 'Warehouse Type - warehouse classification.', 'warehouse_type', { fallbackSelect: 'firstAvailableOrSkip' }),
       selectField('#inv_warehouse_location_id_L0', 'warehouse_country', 'Country - warehouse location country.'),
       fillField('#inv_warehouse_location_id_address', 'warehouse_address', 'Street Address - warehouse address.'),
       fillField('#inv_warehouse_location_id_postcode', 'warehouse_postcode', 'Postcode - warehouse postal code.'),
@@ -332,6 +374,7 @@ test('records warehouse guide', async ({ browser, baseURL }) => {
     '#inv_recv_site_id',
     [
       selectField('#inv_recv_site_id', 'incoming_facility', 'Facility - receiving warehouse.', 'incoming_facility', { match: 'contains', fallbackSelect: 'firstAvailableOrSkip' }),
+      selectField('#inv_recv_from_site_id', 'incoming_from_facility', 'From Facility - sending warehouse or facility.', 'incoming_from_facility', { match: 'contains', fallbackSelect: 'firstAvailableOrSkip' }),
       selectField('#inv_recv_type', 'incoming_shipment_type', 'Shipment Type - receipt type.', 'incoming_shipment_type', { fallbackSelect: 'firstAvailableOrSkip' }),
       fillField('#inv_recv_send_ref', 'incoming_waybill_number', 'Waybill Number - shipment waybill number.'),
       fillField('#inv_recv_purchase_ref', 'incoming_po_number', 'PO Number - purchase order number.'),
@@ -463,26 +506,25 @@ test('records warehouse guide', async ({ browser, baseURL }) => {
   await expect(page).toHaveURL(/\/eden\/inv\/adj\/\d+\/adj_item$/);
   await page.waitForLoadState('networkidle');
 
+  const existingStockItemOpenLink = page
+    .locator('table tbody tr a')
+    .filter({ hasText: /^Open$/i })
+    .first();
+  await expect(existingStockItemOpenLink).toBeVisible();
   await describeAndClick(
-    page.locator('#show-add-btn'),
+    existingStockItemOpenLink,
     t(
       'stock_count_add_item',
-      'Add Item to Stock opens the inline form for entering the counted item and the revised stock details.',
+      'We open an existing stock count item line to review and update the counted stock details.',
     ),
   );
-  await expect(page.locator('#list-add')).toBeVisible();
-  await expect(page.locator('#list-add h3')).toContainText('Add Item to Stock');
-  await fillAutocompleteItem(page, {
-    inputSelector: '#dummy_inv_adj_item_item_id',
-    description: t('stock_count_item', 'Item - choose the product that should be added or corrected in this stock count.'),
-    typedValue: v('stock_count_item', v('item_name', 'First aid kit')),
-    suggestionText: v('stock_count_item_suggestion', v('stock_count_item', v('item_name', 'First aid kit'))),
-    suggestionDescription: t(
-      'stock_count_item_suggestion',
-      'Select the matching item from the autocomplete suggestions so Eden links the form to the real stock item record.',
-    ),
-    hiddenValueSelector: '#inv_adj_item_item_id',
-  });
+  await expect(page).toHaveURL(/\/eden\/inv\/adj\/\d+\/adj_item\/\d+\/update$/);
+  await page.waitForLoadState('networkidle');
+
+  await describeOnly(
+    page.locator('#inv_adj_item_item_id__row, #dummy_inv_adj_item_item_id__row').first(),
+    t('stock_count_item', 'Item - this line is already linked to the stock item being reviewed in the count.'),
+  );
   await expect(page.locator('#inv_adj_item_item_pack_id')).toBeEnabled();
   await describeAndSelect(
     page.locator('#inv_adj_item_item_pack_id'),

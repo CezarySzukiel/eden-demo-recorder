@@ -69,6 +69,7 @@
   "section_received_shipments": "Przyjęte dostawy.",
   "create_received_shipment": "Nowe przyjęcie dostawy do magazynu.",
   "incoming_facility": "Magazyn odbierający.",
+  "incoming_from_facility": "Magazyn lub placówka wysyłająca.",
   "incoming_shipment_type": "Typ dostawy.",
   "incoming_date": "Data przyjęcia.",
   "incoming_waybill_number": "Numer listu przewozowego.",

@@ -20,13 +20,13 @@ const {
   createOrganization,
 } = require('../helpers/organization-flow');
 
-const { captions: locale, values } = loadRecordingLocale('organizations');
+const { language: recordingLanguage, captions: locale, values } = loadRecordingLocale('organizations');
 
 test('records organization setup scenario', async ({ browser, baseURL }) => {
   const user = loadEnvCredentials();
   const content = buildDemoContent('org', values);
   const story = buildOrganizationSetupStory(locale, content);
-  const setupContext = await browser.newContext({ baseURL });
+  const setupContext = await browser.newContext({ baseURL, locale: recordingLanguage });
   const setupPage = await setupContext.newPage();
 
   await loginUser(setupPage, user);
@@ -37,6 +37,7 @@ test('records organization setup scenario', async ({ browser, baseURL }) => {
 
   const recordedContext = await browser.newContext({
     baseURL,
+    locale: recordingLanguage,
     storageState,
     viewport: RECORDING_VIEWPORT,
     recordVideo: {

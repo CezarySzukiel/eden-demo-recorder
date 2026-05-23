@@ -50,6 +50,10 @@ function click(selector, key, options = {}) {
   return field(selector, 'click', key, undefined, options);
 }
 
+function selectFirstMultiselectOption(selector, key, options = {}) {
+  return field(selector, 'selectFirstMultiselectOption', key, undefined, options);
+}
+
 function fill(selector, key, value, options = {}) {
   return field(selector, 'fill', key, value, options);
 }
@@ -75,8 +79,7 @@ function buildOrganizationRecord(locale, content) {
     fields: [
       fill('#org_organisation_name', 'org_name', value(content, 'organizationName'), options),
       fill('#org_organisation_acronym', 'org_acronym', value(content, 'organizationAcronym'), options),
-      click('#link_defaultorganisation_type_ms', 'org_type', options),
-      click('label[for="ui-multiselect-0-link_defaultorganisation_type-option-6"]', 'org_type_ngo', options),
+      selectFirstMultiselectOption('#link_defaultorganisation_type_ms', 'org_type_first_available', options),
       select('#org_organisation_country', 'org_country', value(content, 'organizationCountry'), options),
       fill('#org_organisation_phone', 'org_phone', value(content, 'organizationPhone'), options),
       fill('#org_organisation_website', 'org_website', value(content, 'organizationWebsite'), options),

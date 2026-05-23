@@ -10,6 +10,7 @@ const { expect } = require('playwright/test');
 const fs = require('fs');
 const path = require('path');
 const {
+  getEnvValue,
   getOptionalBooleanEnv,
   getRequiredNumberEnv,
   getRequiredStringEnv,
@@ -1081,8 +1082,38 @@ async function selectFirstAvailableOption(locator) {
   await locator.selectOption(value);
 }
 
+async function clickFirstAvailableMultiselectOption(page) {
+  const options = page.locator('.ui-multiselect-menu:visible label');
+  const count = await options.count();
+
+  for (let index = 0; index < count; index += 1) {
+    const option = options.nth(index);
+    const text = await option.textContent();
+    const normalized = typeof text === 'string' ? text.replace(/\s+/g, ' ').trim() : '';
+
+    if (!normalized) {
+      continue;
+    }
+    if (/^select$/i.test(normalized) || /^select\s/i.test(normalized)) {
+      continue;
+    }
+    if (/^-+$/.test(normalized)) {
+      continue;
+    }
+
+    await option.click();
+    return;
+  }
+
+  throw new Error('Could not find a selectable multiselect option');
+}
+
 function shouldSkipUnavailableSelect(step) {
   return step.fallbackSelect === 'skip' || step.fallbackSelect === 'firstAvailableOrSkip';
+}
+
+function isTimeoutError(error) {
+  return error.message && error.message.includes('Timeout');
 }
 
 async function dismissVisibleAutocomplete(page) {
@@ -1117,7 +1148,14 @@ async function dismissVisibleAutocomplete(page) {
 async function runFieldStep(locator, step) {
   const delay = step.captionDelay ?? DEFAULT_CAPTION_DELAY_MS;
   const page = locator.page();
-  await locator.waitFor({ state: 'visible', timeout: step.waitTimeout ?? FIELD_WAIT_TIMEOUT_MS });
+  try {
+    await locator.waitFor({ state: 'visible', timeout: step.waitTimeout ?? FIELD_WAIT_TIMEOUT_MS });
+  } catch (error) {
+    if (shouldSkipUnavailableSelect(step) && isTimeoutError(error)) {
+      return;
+    }
+    throw error;
+  }
   await dismissVisibleAutocomplete(page);
   await moveDemoCursor(locator);
   const caption = await showCaption(page, step.description, delay);
@@ -1237,6 +1275,13 @@ async function describeAndSelect(locator, description, value, match = 'exact', f
 
 async function describeAndClick(locator, description) {
   await runFieldStep(locator, { action: 'click', description });
+}
+
+async function describeAndSelectFirstMultiselectOption(locator, description) {
+  const page = locator.page();
+  await runFieldStep(locator, { action: 'click', description });
+  await clickFirstAvailableMultiselectOption(page);
+  await page.waitForTimeout(ACTION_DELAY_MS);
 }
 
 async function describeOnly(locator, description, delay = DEFAULT_HOVER_DELAY_MS) {
@@ -1402,6 +1447,7 @@ module.exports = {
   describeAndClick,
   describeAndFill,
   describeAndSelect,
+  describeAndSelectFirstMultiselectOption,
   describeOnly,
   describeOnlyIfVisible,
   enableDemoCursor,

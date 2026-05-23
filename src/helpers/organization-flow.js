@@ -11,6 +11,7 @@ const {
   describeAndClick,
   describeAndFill,
   describeAndSelect,
+  describeAndSelectFirstMultiselectOption,
   describeOnly,
   describeOnlyIfVisible,
   navigateViaHref,
@@ -100,6 +101,11 @@ async function runDescribedField(page, step) {
 
   if (step.action === 'click') {
     await describeAndClick(locator, step.description);
+    return;
+  }
+
+  if (step.action === 'selectFirstMultiselectOption') {
+    await describeAndSelectFirstMultiselectOption(locator, step.description);
     return;
   }
 

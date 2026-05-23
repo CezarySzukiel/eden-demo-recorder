@@ -69,6 +69,7 @@
   "section_received_shipments": "Received shipments.",
   "create_received_shipment": "New shipment receipt into the warehouse.",
   "incoming_facility": "Receiving warehouse.",
+  "incoming_from_facility": "Sending warehouse or facility.",
   "incoming_shipment_type": "Shipment type.",
   "incoming_date": "Receipt date.",
   "incoming_waybill_number": "Waybill number.",

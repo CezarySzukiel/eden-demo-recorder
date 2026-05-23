@@ -52,6 +52,7 @@
   "warehouse_email": "magazyn.centrum@example.org",
   "warehouse_comments": "Magazyn wspierający dystrybucję w centralnej części miasta.",
   "incoming_facility": "MS Warehouse (Warehouse)",
+  "incoming_from_facility": "Baucau Warehouse (Warehouse)",
   "incoming_shipment_type": {
     "label": "Another Inventory"
   },
@@ -96,11 +97,11 @@
   "commitment_comments": "Deklaracja pokrywa część potrzeb zgłoszonych w zapotrzebowaniu.",
   "distribution_organization": "Timor-Leste Red Cross Society",
   "distribution_date": "2026-05-05",
-  "distribution_staff_member": "Piotr Miller",
+  "distribution_staff_member": "Jonh Doe",
   "distribution_recipient": "Alicja Carter",
   "stock_count_comments": "Kontrolny spis zapasów przed zamknięciem zmiany.",
-  "stock_count_item": "Apteczka pierwszej pomocy",
-  "stock_count_item_suggestion": "Apteczka pierwszej pomocy",
+  "stock_count_item": "Open blanket",
+  "stock_count_item_suggestion": "Open blanket",
   "stock_count_pack": {
     "label": "piece"
   },

@@ -18,7 +18,7 @@ const {
   navigateViaHref,
 } = require('../helpers/eden-demo');
 
-const { captions: locale, values } = loadRecordingLocale('volunteers');
+const { language: recordingLanguage, captions: locale, values } = loadRecordingLocale('volunteers');
 
 function v(key, fallback = '') {
   return values[key] ?? fallback;
@@ -219,7 +219,7 @@ test('records volunteers guide', async ({ browser, baseURL }) => {
   const story = buildVolunteersStory(locale, demoContent);
   
   // Phase 2: Login and save storage state
-  const setupContext = await browser.newContext({ baseURL });
+  const setupContext = await browser.newContext({ baseURL, locale: recordingLanguage });
   const setupPage = await setupContext.newPage();
   
   await loginUser(setupPage, user);
@@ -230,6 +230,7 @@ test('records volunteers guide', async ({ browser, baseURL }) => {
   // Phase 3: Create recording context with video
   const recordedContext = await browser.newContext({
     baseURL,
+    locale: recordingLanguage,
     storageState,
     viewport: RECORDING_VIEWPORT,
     recordVideo: {

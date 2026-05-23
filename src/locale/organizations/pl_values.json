@@ -10,7 +10,7 @@
   "organizationComments": "Organizacja wspierająca lokalne działania pomocowe.",
 
   "officeName": "Biuro Warszawa {suffix}",
-  "officeCode": "BW-{runId}",
+  "officeCode": "B{runId}",
   "officeType": {
     "label": "Headquarters"
   },
@@ -26,7 +26,7 @@
   "officeComments": "Główne biuro koordynujące działania w Warszawie.",
 
   "facilityName": "Punkt Dystrybucji {suffix}",
-  "facilityCode": "PD-{runId}",
+  "facilityCode": "P{runId}",
   "facilityCountry": {
     "label": "Poland"
   },
